@@ -1108,7 +1108,7 @@ const findGifts = async () => {
 if (!relation && !forMe) { setError("Select who this gift is for."); return; }
 setError(null); setLoading(true); setResults([]); setSaved(false);
 try {
-const res = await fetch("https://api.anthropic.com/v1/messages", {
+const res = await fetch("/api/claude", {
 method: "POST",
 headers: {
 "Content-Type": "application/json",
@@ -1166,7 +1166,7 @@ return `${i}. ${rel?.label || "Person"}${p.name ? " (" + p.name + ")" : ""}, age
 }).join("\n");
 const prompt = `You are a US gift trend expert for 2026. Preferred stores: ${storeNames}. Return ONLY valid JSON. Find 2 trending gift ideas for each person: ${list} Each idea: { "personIndex": 0, "title": "Gift name", "searchQuery": "3-5 word search phrase", "trendReason": "Why trending in 2026 (max 8 words)", "description": "Why they will love it (2 sentences)", "category": "Fashion, Tech, Home, Beauty, Food, Sports, Gaming, Books, Experience, or Other", "priceHint": "Budget, Mid-range, Premium, or Luxury" } Format: { "gifts": [ ... ] }`;
 try {
-const res = await fetch("https://api.anthropic.com/v1/messages", {
+const res = await fetch("/api/claude", {
 method: "POST",
 headers: {
 "Content-Type": "application/json",
