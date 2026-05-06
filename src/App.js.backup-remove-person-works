@@ -1,0 +1,1771 @@
+import { useState, useRef, useEffect } from "react";
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+const LOGO_IMG = "data:image/jpeg;base64,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";
+
+const RELATIONS = [
+{ id: "myself", label: "For Me", emoji: "🎁", forMe: true },
+{ id: "mom", label: "Mom", emoji: "👩" },
+{ id: "dad", label: "Dad", emoji: "👨" },
+{ id: "sister", label: "Sister", emoji: "👧" },
+{ id: "brother", label: "Brother", emoji: "👦" },
+{ id: "nephew", label: "Nephew", emoji: "🧒" },
+{ id: "niece", label: "Niece", emoji: "👶" },
+{ id: "grandma", label: "Grandma", emoji: "👵" },
+{ id: "grandpa", label: "Grandpa", emoji: "👴" },
+{ id: "husband", label: "Husband", emoji: "🤵" },
+{ id: "wife", label: "Wife", emoji: "👰" },
+{ id: "pet", label: "Pet", emoji: "🐾" },
+{ id: "boyfriend", label: "Boyfriend", emoji: "💑" },
+{ id: "girlfriend", label: "Girlfriend", emoji: "💏" },
+{ id: "friend", label: "Friend", emoji: "🤝" },
+{ id: "coworker", label: "Coworker", emoji: "💼" },
+{ id: "teacher", label: "Teacher", emoji: "📚" },
+{ id: "custom", label: "Custom", emoji: "✨" },
+];
+const OCCASIONS = [
+{ id: "birthday", label: "Birthday", emoji: "🎂" },
+{ id: "christmas", label: "Christmas", emoji: "🎄" },
+{ id: "newyear", label: "New Year", emoji: "🥂" },
+{ id: "valentines", label: "Valentine's", emoji: "❤️" },
+{ id: "mothers", label: "Mother's Day", emoji: "🌷" },
+{ id: "fathers", label: "Father's Day", emoji: "👔" },
+{ id: "graduation", label: "Graduation", emoji: "🎓" },
+{ id: "wedding", label: "Wedding", emoji: "💍" },
+{ id: "hanukkah", label: "Hanukkah", emoji: "🕎" },
+{ id: "just", label: "Just Because", emoji: "🌟" },
+];
+const AGES = ["Under 5","5–12","13–17","18–25","26–35","36–50","50+"];
+const BUDGETS = [
+{ id: "u25", label: "Under $25" },
+{ id: "u50", label: "$25–$50" },
+{ id: "u100", label: "$50–$100" },
+{ id: "u200", label: "$100–$200" },
+{ id: "u500", label: "$200–$500" },
+{ id: "500p", label: "$500+" },
+];
+
+// FIX: All stores now have proper commas — was missing comma after Target
+const STORE_CATALOG = [
+{ cat: "🛒 General", stores: [
+{ id: "amazon", label: "Amazon", url: "https://www.amazon.com/s?k=" },
+{ id: "target", label: "Target", url: "https://www.target.com/s?searchTerm=" },
+{ id: "walmart", label: "Walmart", url: "https://www.walmart.com/search?q=" },
+{ id: "costco", label: "Costco", url: "https://www.costco.com/CatalogSearch?keyword=" },
+]},
+{ cat: "🎨 Handmade & Unique", stores: [
+{ id: "etsy", label: "Etsy", url: "https://www.etsy.com/search?q=" },
+{ id: "uncommon", label: "Uncommon Goods", url: "https://www.uncommongoods.com/search?query=" },
+]},
+{ cat: "💰 Budget & Deals", stores: [
+{ id: "aliexpress", label: "AliExpress", url: "https://www.aliexpress.com/wholesale?SearchText=" },
+{ id: "temu", label: "Temu", url: "https://www.temu.com/search_result.html?search_key=" },
+{ id: "shein", label: "SHEIN", url: "https://www.shein.com/search?q=" },
+]},
+{ cat: "👗 Fashion", stores: [
+{ id: "asos", label: "ASOS", url: "https://www.asos.com/search/?q=" },
+{ id: "nordstrom", label: "Nordstrom", url: "https://www.nordstrom.com/sr?keyword=" },
+{ id: "zara", label: "Zara", url: "https://www.zara.com/us/en/search?searchTerm=" },
+{ id: "hm", label: "H&M", url: "https://www2.hm.com/en_us/search-results.html?q=" },
+]},
+{ cat: "💻 Tech", stores: [
+{ id: "bestbuy", label: "Best Buy", url: "https://www.bestbuy.com/site/searchpage.jsp?st=" },
+{ id: "newegg", label: "Newegg", url: "https://www.newegg.com/p/pl?d=" },
+{ id: "apple", label: "Apple", url: "https://www.apple.com/shop/buy-" },
+]},
+{ cat: "🏠 Home & DIY", stores: [
+{ id: "homedepot", label: "Home Depot", url: "https://www.homedepot.com/s/" },
+{ id: "lowes", label: "Lowe's", url: "https://www.lowes.com/search?searchTerm=" },
+{ id: "wayfair", label: "Wayfair", url: "https://www.wayfair.com/keyword.php?keyword=" },
+{ id: "ikea", label: "IKEA", url: "https://www.ikea.com/us/en/search/?q=" },
+]},
+{ cat: "💄 Beauty & Wellness", stores: [
+{ id: "sephora", label: "Sephora", url: "https://www.sephora.com/search?keyword=" },
+{ id: "ulta", label: "Ulta Beauty", url: "https://www.ulta.com/search?search=" },
+]},
+{ cat: "🎮 Gaming", stores: [
+{ id: "gamestop", label: "GameStop", url: "https://www.gamestop.com/search/?q=" },
+{ id: "steam", label: "Steam", url: "https://store.steampowered.com/search/?term=" },
+]},
+{ cat: "📖 Books & Hobbies", stores: [
+{ id: "bookshop", label: "Bookshop.org", url: "https://bookshop.org/search?keywords=" },
+{ id: "rei", label: "REI (Outdoor)", url: "https://www.rei.com/search?q=" },
+{ id: "ebay", label: "eBay", url: "https://www.ebay.com/sch/i.html?_nkw=" },
+]},
+{ cat: "🍕 Food & Gourmet", stores: [
+{ id: "goldbelly", label: "Goldbelly", url: "https://www.goldbelly.com/search?q=" },
+{ id: "harrydavid", label: "Harry & David", url: "https://www.harryanddavid.com/search?q=" },
+{ id: "chewy", label: "Chewy (Pets)", url: "https://www.chewy.com/s?query=" },
+]},
+{ cat: "🌍 Experiences", stores: [
+{ id: "airbnb", label: "Airbnb Exp.", url: "https://www.airbnb.com/s/experiences?query=" },
+{ id: "viator", label: "Viator", url: "https://www.viator.com/search/" },
+]},
+];
+
+const ALL_STORES = STORE_CATALOG.flatMap(c => c.stores);
+const DEFAULT_STORES = ["amazon", "etsy", "target"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONTH_NUMS = { Jan:"01",Feb:"02",Mar:"03",Apr:"04",May:"05",Jun:"06",Jul:"07",Aug:"08",Sep:"09",Oct:"10",Nov:"11",Dec:"12" };
+
+const uid = () => Math.random().toString(36).slice(2, 9);
+const Q = s => encodeURIComponent((s || "").trim());
+const mkLinks = (q, ids, custom = []) => [
+...ALL_STORES.filter(s => ids.includes(s.id)).map(s => ({ label: s.label, url: s.url + Q(q) })),
+...custom.map(s => ({ label: s.label, url: s.url + Q(q) })),
+];
+
+// FIX: daysUntil now handles "Jan 15 2000" format (3-part string) AND "YYYY-MM-DD"
+const daysUntil = d => {
+if (!d) return null;
+let dateStr = d;
+// Handle "Mon DD YYYY" format stored by the birthday fields
+const parts = d.trim().split(/\s+/);
+if (parts.length >= 2 && MONTH_NUMS[parts[0]]) {
+const month = MONTH_NUMS[parts[0]];
+const day = parts[1] ? parts[1].padStart(2, "0") : "01";
+const thisYear = new Date().getFullYear();
+const yearPart = parts[2] || thisYear;
+// Use current year for upcoming calculation
+const md = `${month}-${day}`;
+dateStr = `${thisYear}-${md}`;
+const diff = Math.ceil((new Date(dateStr + "T12:00:00") - new Date()) / 86400000);
+if (diff < 0) dateStr = `${thisYear + 1}-${md}`;
+}
+return Math.ceil((new Date(dateStr + "T12:00:00") - new Date()) / 86400000);
+};
+
+// ─── TOKENS ───────────────────────────────────────────────────────────────────
+const C = {
+bg: "#f7f5f2",
+card: "#ffffff",
+border: "#ebe7e1",
+text: "#1a1714",
+sub: "#6b6460",
+muted: "#b0a89e",
+accent: "#c2714f",
+accentL: "#fdf0eb",
+gold: "#e8a020",
+goldL: "#fff8e6",
+};
+const css = `@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap'); *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } body { background: ${C.bg}; font-family: 'Nunito', sans-serif; -webkit-font-smoothing: antialiased; } ::-webkit-scrollbar { height: 3px; width: 3px; } ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; } @keyframes up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} } @keyframes fade { from{opacity:0} to{opacity:1} } @keyframes spin { to{transform:rotate(360deg)} } input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.4; cursor: pointer; } .pw-app { overflow-x: hidden; } .pw-hscroll { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; } .pw-hscroll::-webkit-scrollbar { display: none; } div::-webkit-scrollbar { display: none; }`;
+
+// ─── ICONS ────────────────────────────────────────────────────────────────────
+const ICON_COLOR = { wish: "#c2714f", groups: "#c2714f", calendar: "#c2714f", stores: "#c2714f" };
+const Icon = {
+// Magic wand — палочка идёт точно к нижнему левому лучу звезды
+WishList: () => (
+<svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+{/* Звезда — центр 16,9, размер умеренный */}
+<path
+d="M16 4 L17.2 7.8 L21.2 7.8 L18 10.2 L19.2 14 L16 11.6 L12.8 14 L14 10.2 L10.8 7.8 L14.8 7.8 Z"
+fill={ICON_COLOR.wish}
+stroke={ICON_COLOR.wish}
+strokeWidth="0.3"
+strokeLinejoin="round"
+/>
+{/* Палочка — идёт от нижнего-левого угла звезды (12.8,14) вниз-влево */}
+<line x1="12.8" y1="14" x2="4.5" y2="22" stroke={ICON_COLOR.wish} strokeWidth="2.2" strokeLinecap="round"/>
+{/* Блеск рядом со звездой */}
+<path d="M21 4 L21 5.5 M20.25 4.75 L21.75 4.75" stroke={ICON_COLOR.wish} strokeWidth="1.4" strokeLinecap="round"/>
+<path d="M8 5 L8 6 M7.5 5.5 L8.5 5.5" stroke={ICON_COLOR.wish} strokeWidth="1.2" strokeLinecap="round" opacity="0.6"/>
+</svg>
+),
+Groups: () => (
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+<circle cx="9" cy="7.5" r="2.8" stroke={ICON_COLOR.groups} strokeWidth="1.8" fill={ICON_COLOR.groups} fillOpacity="0.1"/>
+<path d="M3 19c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke={ICON_COLOR.groups} strokeWidth="1.8" strokeLinecap="round"/>
+<circle cx="17.5" cy="8.5" r="2.2" stroke={ICON_COLOR.groups} strokeWidth="1.5" fill={ICON_COLOR.groups} fillOpacity="0.1"/>
+<path d="M15.5 19c0-2 1.12-3.5 2-3.5S20 17 20 19" stroke={ICON_COLOR.groups} strokeWidth="1.5" strokeLinecap="round"/>
+</svg>
+),
+Calendar: () => (
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+<rect x="3" y="5" width="18" height="16" rx="3" stroke={ICON_COLOR.calendar} strokeWidth="1.6"/>
+<path d="M3 10h18" stroke={ICON_COLOR.calendar} strokeWidth="1.4"/>
+<path d="M8 3v4M16 3v4" stroke={ICON_COLOR.calendar} strokeWidth="1.8" strokeLinecap="round"/>
+<circle cx="8" cy="15" r="1.3" fill={ICON_COLOR.calendar}/>
+<circle cx="12" cy="15" r="1.3" fill={ICON_COLOR.calendar} opacity="0.6"/>
+<circle cx="16" cy="15" r="1.3" fill={ICON_COLOR.calendar} opacity="0.3"/>
+</svg>
+),
+Stores: () => (
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+<path d="M6 8h12l-1.2 9a2 2 0 01-2 1.8H9.2a2 2 0 01-2-1.8L6 8z"
+stroke={ICON_COLOR.stores} strokeWidth="1.7" strokeLinejoin="round" fill={ICON_COLOR.stores} fillOpacity="0.1"/>
+<path d="M9 8V6a3 3 0 016 0v2" stroke={ICON_COLOR.stores} strokeWidth="1.7" strokeLinecap="round"/>
+<path d="M9.5 13h5" stroke={ICON_COLOR.stores} strokeWidth="1.5" strokeLinecap="round"/>
+</svg>
+),
+};
+
+// ─── ATOMS ────────────────────────────────────────────────────────────────────
+function FL({ children }) {
+return <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.5, color: C.muted, textTransform: "uppercase", marginBottom: 8 }}>{children}</div>;
+}
+function Chip({ label, active, onClick, gold }) {
+return (
+<button onClick={onClick} style={{
+padding: "7px 14px", borderRadius: 999, cursor: "pointer", flexShrink: 0,
+border: `1.5px solid ${active ? (gold ? C.gold : C.accent) : C.border}`,
+background: active ? (gold ? C.goldL : C.accentL) : "transparent",
+color: active ? (gold ? C.gold : C.accent) : C.sub,
+fontSize: 13, fontWeight: 700, whiteSpace: "nowrap", transition: "all .13s", fontFamily: "inherit",
+}}>{label}</button>
+);
+}
+function TInput({ value, onChange, placeholder, type = "text" }) {
+const [f, setF] = useState(false);
+return (
+<input value={value} onChange={onChange} placeholder={placeholder} type={type}
+onFocus={() => setF(true)} onBlur={() => setF(false)}
+style={{
+width: "100%", padding: "11px 14px", fontSize: 14,
+color: C.text, fontFamily: "inherit",
+border: `1.5px solid ${f ? C.accent : C.border}`,
+borderRadius: 12, background: C.card,
+outline: "none", transition: "border-color .15s",
+}}
+/>
+);
+}
+function Sep() {
+return <div style={{ height: 1, background: C.border, margin: "2px 0" }} />;
+}
+
+// ─── BOTTOM SHEET ─────────────────────────────────────────────────────────────
+function Sheet({ children, onClose, title }) {
+return (
+<div onClick={e => e.target === e.currentTarget && onClose()} style={{
+position: "fixed", inset: 0, background: "rgba(26,23,20,.32)",
+display: "flex", alignItems: "flex-end", zIndex: 200,
+animation: "fade .18s ease",
+}}>
+<div style={{
+width: "100%", maxWidth: 680, margin: "0 auto",
+background: C.bg, borderRadius: "22px 22px 0 0",
+padding: "10px 20px 80px", maxHeight: "90vh", overflowY: "auto",
+animation: "up .22s ease",
+}}>
+<div style={{ width: 36, height: 4, borderRadius: 2, background: "#ddd", margin: "0 auto 18px" }} />
+{title && <div style={{ fontSize: 18, fontWeight: 900, color: C.text, marginBottom: 16 }}>{title}</div>}
+{children}
+</div>
+</div>
+);
+}
+
+// ─── PHOTO PICKER ─────────────────────────────────────────────────────────────
+function PhotoPicker({ photo, onPhoto, size = 52 }) {
+const ref = useRef();
+return (
+<>
+<div onClick={() => ref.current.click()} style={{
+width: size, height: size, borderRadius: size / 3,
+background: photo ? "transparent" : C.border,
+border: `1.5px solid ${C.border}`,
+display: "flex", alignItems: "center", justifyContent: "center",
+cursor: "pointer", overflow: "hidden", flexShrink: 0,
+}}>
+{photo
+? <img src={photo} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="" />
+: <span style={{ fontSize: size * 0.4, color: C.muted }}>📷</span>
+}
+</div>
+<input ref={ref} type="file" accept="image/*" style={{ display: "none" }}
+onChange={e => {
+const file = e.target.files[0];
+if (!file) return;
+const reader = new FileReader();
+reader.onload = ev => onPhoto(ev.target.result);
+reader.readAsDataURL(file);
+}} />
+</>
+);
+}
+
+// ─── GIFT CARD ────────────────────────────────────────────────────────────────
+function GiftCard({ gift, storeIds, customStores, idx, onWish, isWished }) {
+const [open, setOpen] = useState(false);
+const links = mkLinks(gift.searchQuery || gift.title, storeIds, customStores);
+const bud = BUDGETS.find(b => b.id === gift.budget);
+return (
+<div style={{
+background: C.card, border: `1.5px solid ${C.border}`,
+borderRadius: 16, overflow: "hidden",
+animation: `up .3s ease ${idx * .07}s both`,
+}}>
+<div onClick={() => setOpen(o => !o)} style={{ padding: "14px 16px", cursor: "pointer" }}>
+<div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+<div style={{
+width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+background: C.accentL, display: "flex", alignItems: "center",
+justifyContent: "center", fontSize: 13, fontWeight: 900, color: C.accent, marginTop: 1,
+}}>{idx + 1}</div>
+<div style={{ flex: 1 }}>
+{bud && (
+<span style={{
+fontSize: 11, fontWeight: 800, background: "#f5f0eb",
+color: C.sub, borderRadius: 6, padding: "2px 8px",
+display: "inline-block", marginBottom: 5,
+}}>{bud.label}</span>
+)}
+<div style={{ fontSize: 15, fontWeight: 800, color: C.text, lineHeight: 1.3 }}>
+{gift.title}
+</div>
+<div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+<span style={{ fontSize: 12, color: C.accent, fontWeight: 700 }}>↗ {gift.trendReason}</span>
+{gift.category && (
+<span style={{
+fontSize: 10, fontWeight: 800, color: C.muted,
+background: "#f0ebe4", borderRadius: 5, padding: "1px 6px",
+letterSpacing: 0.3, textTransform: "uppercase",
+}}>{gift.category}</span>
+)}
+{gift.priceHint && (
+<span style={{
+fontSize: 10, fontWeight: 800, borderRadius: 5, padding: "1px 6px",
+background: gift.priceHint==="Budget"?"#e8f5e9":gift.priceHint==="Luxury"?"#fce4ec":gift.priceHint==="Premium"?"#fff3e0":"#f3e5f5",
+color: gift.priceHint==="Budget"?"#388e3c":gift.priceHint==="Luxury"?"#c62828":gift.priceHint==="Premium"?"#e65100":"#7b1fa2",
+}}>{gift.priceHint}</span>
+)}
+</div>
+</div>
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+{onWish && (
+<button onClick={e => { e.stopPropagation(); onWish(gift, links); }} style={{
+background: isWished ? C.goldL : "#f5f0eb",
+border: `1.5px solid ${isWished ? C.gold : C.border}`,
+borderRadius: 8, width: 32, height: 32, cursor: "pointer",
+fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center",
+}}>{isWished ? "⭐" : "☆"}</button>
+)}
+<span style={{ color: C.muted, fontSize: 11 }}>{open ? "▲" : "▼"}</span>
+</div>
+</div>
+</div>
+{open && (
+<div style={{ padding: "12px 16px 16px", borderTop: `1px solid ${C.border}` }}>
+<p style={{ fontSize: 13, color: C.sub, lineHeight: 1.7, marginBottom: 14 }}>{gift.description}</p>
+<div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+{links.map((lk, i) => (
+<a key={i} href={lk.url} target="_blank" rel="noreferrer" style={{
+padding: "7px 13px", background: C.accent, color: "#fff",
+borderRadius: 9, fontSize: 12, fontWeight: 800,
+textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 5,
+}}>🛍 {lk.label}</a>
+))}
+</div>
+</div>
+)}
+</div>
+);
+}
+
+// ─── WISH LIST SHEET ──────────────────────────────────────────────────────────
+function WishListSheet({ wishList, onRemove, onClear, onClose, myName, myBirthday }) {
+const [copied, setCopied] = useState(false);
+const doShare = () => {
+const who = myName ? `${myName}'s` : "My";
+const bdStr = myBirthday ? `\n  Birthday: ${myBirthday}` : "";
+const text = `🎁 ${who} Wish List (via Pickwell)${bdStr}\n\n` +
+wishList.map((item, i) =>
+`${i + 1}. ${item.title}\n   ${item.storeLinks?.[0]?.url || ""}`
+).join("\n\n") +
+`\n\nFind the perfect gift → pickwell.com`;
+if (navigator.share) {
+navigator.share({ title: "My Wish List", text }).catch(() => {});
+} else {
+navigator.clipboard.writeText(text).then(() => {
+setCopied(true);
+setTimeout(() => setCopied(false), 2500);
+});
+}
+};
+return (
+<Sheet onClose={onClose} title="⭐ My Wish List">
+{wishList.length === 0 ? (
+<div style={{ textAlign: "center", padding: "36px 20px",
+border: `2px dashed ${C.border}`, borderRadius: 16,
+color: C.muted, fontSize: 14, lineHeight: 1.7,
+}}>
+<div style={{ fontSize: 40, marginBottom: 10 }}>🎁</div>
+Nothing saved yet.<br />
+Select <strong style={{ color: C.gold }}>🎁 For Me</strong>, find gifts, tap ☆ to save.
+</div>
+) : (
+<>
+{(myName || myBirthday) && (
+<div style={{
+background: C.goldL, border: `1.5px solid #f9a82544`,
+borderRadius: 14, padding: "12px 16px", marginBottom: 16,
+display: "flex", alignItems: "center", gap: 12,
+}}>
+<span style={{ fontSize: 28 }}>🦊</span>
+<div>
+{myName && <div style={{ fontWeight: 800, fontSize: 15, color: C.text }}>{myName}</div>}
+{myBirthday && <div style={{ fontSize: 12, color: C.gold, fontWeight: 700, marginTop: 2 }}>🎂 {myBirthday}</div>}
+</div>
+</div>
+)}
+<div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+<button onClick={onClear} style={{
+background: "none", border: "none", fontSize: 12,
+color: C.muted, cursor: "pointer", fontFamily: "inherit", fontWeight: 700,
+}}>Clear all</button>
+</div>
+<div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
+{wishList.map((item, i) => (
+<div key={item.id} style={{
+background: C.card, border: `1.5px solid ${C.border}`,
+borderRadius: 14, padding: "13px 16px",
+display: "flex", alignItems: "flex-start", gap: 12,
+animation: `up .25s ease ${i * .05}s both`,
+}}>
+<div style={{ flex: 1 }}>
+<div style={{ fontWeight: 800, fontSize: 14, color: C.text, marginBottom: 3 }}>{item.title}</div>
+<div style={{ fontSize: 12, color: C.accent, fontWeight: 700, marginBottom: 6 }}>↗ {item.trendReason}</div>
+<div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+{item.storeLinks?.map((lk, j) => (
+<a key={j} href={lk.url} target="_blank" rel="noreferrer" style={{
+padding: "5px 10px", background: "#f5f0eb", color: C.sub,
+borderRadius: 7, fontSize: 11, fontWeight: 700, textDecoration: "none",
+}}>🛍 {lk.label}</a>
+))}
+</div>
+</div>
+<button onClick={() => onRemove(item.id)} style={{
+background: "none", border: "none", color: C.muted,
+cursor: "pointer", fontSize: 20, lineHeight: 1, padding: 0,
+}}>×</button>
+</div>
+))}
+</div>
+<button onClick={doShare} style={{
+width: "100%", padding: 14, borderRadius: 13, border: "none",
+background: C.accent, color: "#fff",
+fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit",
+}}>
+{copied ? "✓ Copied!" : "📤 Share My Wish List"}
+</button>
+<div style={{ fontSize: 11, color: C.muted, textAlign: "center", marginTop: 8 }}>
+Opens iMessage, WhatsApp, Email — or copies to clipboard
+</div>
+</>
+)}
+</Sheet>
+);
+}
+
+// ─── CUSTOM OCCASION INPUT ────────────────────────────────────────────────────
+function CustomOccasionInput({ onSearch }) {
+const [val, setVal] = useState("");
+return (
+<div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+<input
+placeholder="✏️ Custom: Ramadan, Diwali, Nowruz..."
+value={val}
+onChange={e => setVal(e.target.value)}
+onKeyDown={e => { if (e.key === "Enter" && val.trim()) { onSearch(val.trim()); setVal(""); } }}
+style={{
+flex: 1, padding: "9px 12px", fontSize: 12,
+border: `1.5px solid ${C.border}`, borderRadius: 10,
+background: C.card, color: C.text,
+fontFamily: "inherit", outline: "none",
+}}
+/>
+<button
+onClick={() => { if (val.trim()) { onSearch(val.trim()); setVal(""); } }}
+disabled={!val.trim()}
+style={{
+padding: "9px 14px", borderRadius: 10, border: "none",
+background: val.trim() ? C.accent : C.border,
+color: val.trim() ? "#fff" : C.muted,
+fontSize: 12, fontWeight: 800,
+cursor: val.trim() ? "pointer" : "not-allowed",
+fontFamily: "inherit", flexShrink: 0,
+}}>Find</button>
+</div>
+);
+}
+
+// ─── GROUPS SHEET ─────────────────────────────────────────────────────────────
+function GroupsSheet({ groups, onLoadPerson, onCreate, onClose, onBulkSearch, bulkLoading, onDelete, onRemovePerson }) {
+  const [openId, setOpenId] = useState(null);
+  const [confirm, setConfirm] = useState(null);
+  const [groupBudget, setGroupBudget] = useState("");
+  const [budgetMode, setBudgetMode] = useState("Equal split");
+  const [selectedOccasion, setSelectedOccasion] = useState("");
+  const [customOcc, setCustomOcc] = useState("");
+
+  const handleFind = (g) => {
+    if (customOcc.trim()) {
+      onBulkSearch(g, null, customOcc.trim(), groupBudget, budgetMode);
+    } else if (selectedOccasion) {
+      onBulkSearch(g, selectedOccasion, null, groupBudget, budgetMode);
+    }
+  };
+
+  return (
+    <Sheet onClose={onClose} title="👥 Groups">
+      {groups.length === 0 && (
+        <div style={{ textAlign: "center", color: C.muted, fontSize: 13, padding: "24px 0" }}>
+          No groups yet. Add people to groups from the main search.
+        </div>
+      )}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {groups.map(g => (
+          <div key={g.id} style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 16, overflow: "hidden" }}>
+            <div style={{ padding: "14px 16px", display: "flex", alignItems: "center", gap: 12 }}>
+              <div onClick={() => setOpenId(openId === g.id ? null : g.id)} style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, cursor: "pointer" }}>
+                <span style={{ fontSize: 24 }}>{g.emoji}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 800, fontSize: 15, color: C.text }}>{g.name}</div>
+                  <div style={{ fontSize: 12, color: C.muted }}>{g.people.length} people</div>
+                </div>
+                <span style={{ color: C.muted, fontSize: 12 }}>{openId === g.id ? "▲" : "▼"}</span>
+              </div>
+              <button onClick={(e) => { e.stopPropagation(); setConfirm({ title: "Delete group?", body: "People will stay in My People.", onYes: () => { onDelete(g.id); setConfirm(null); } }); }} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 6px", borderRadius: 8 }}>
+                <svg width="16" height="16" viewBox="0 0 22 22" fill="none">
+                  <path d="M6 6h10" stroke="#e07070" strokeWidth="1.8" strokeLinecap="round"/>
+                  <path d="M9 6V4.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V6" stroke="#e07070" strokeWidth="1.5" strokeLinecap="round"/>
+                  <rect x="6.5" y="7" width="9" height="11" rx="1.5" stroke="#e07070" strokeWidth="1.5"/>
+                  <path d="M9 10v5M11 10v5M13 10v5" stroke="#e07070" strokeWidth="1.3" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </div>
+            {openId === g.id && (
+              <>
+                {g.people.map((p) => {
+                  const rel = RELATIONS.find(r => r.id === p.relation);
+                  const bd = daysUntil(p.birthday);
+                  return (
+                    <div key={p.id} style={{ padding: "11px 16px 11px 20px", borderTop: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 12 }}>
+                      <div onClick={() => { onLoadPerson(p); onClose(); }} style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, cursor: "pointer" }}>
+                        {p.photo ? <img src={p.photo} style={{ width: 36, height: 36, borderRadius: 10, objectFit: "cover" }} alt="" /> : <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f5f0eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{rel?.emoji}</div>}
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{p.name || rel?.label}</div>
+                          <div style={{ fontSize: 12, color: C.muted }}>{[p.age, p.interests].filter(Boolean).join(" · ")}</div>
+                          {bd !== null && bd >= 0 && bd <= 30 && (<div style={{ fontSize: 11, color: C.accent, fontWeight: 800 }}>🎂 Birthday in {bd}d</div>)}
+                        </div>
+                        <span style={{ color: C.muted, fontSize: 14 }}>→</span>
+                      </div>
+                      <button onClick={(e) => { e.stopPropagation(); setConfirm({ title: "Remove from group?", body: "Person stays in My People.", onYes: () => { onRemovePerson(g.id, p.id); setConfirm(null); } }); }} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 6px", borderRadius: 8 }}>
+                        <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
+                          <path d="M6 6h10" stroke="#e07070" strokeWidth="1.8" strokeLinecap="round"/>
+                          <path d="M9 6V4.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V6" stroke="#e07070" strokeWidth="1.5" strokeLinecap="round"/>
+                          <rect x="6.5" y="7" width="9" height="11" rx="1.5" stroke="#e07070" strokeWidth="1.5"/>
+                          <path d="M9 10v5M11 10v5M13 10v5" stroke="#e07070" strokeWidth="1.3" strokeLinecap="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  );
+                })}
+                {g.people.length > 0 && (
+                  <div style={{ borderTop: `1px solid ${C.border}`, background: "#faf8f5", padding: "16px 16px 20px" }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: C.text, marginBottom: 14 }}>🎁 Find gifts for all {g.people.length} people</div>
+                    <div style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 14, padding: "14px 14px 16px", marginBottom: 12 }}>
+                      <FL>Budget</FL>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 10 }}>
+                        {BUDGETS.map(b => (<Chip key={b.id} label={b.label} active={groupBudget === b.id} onClick={() => setGroupBudget(x => x === b.id ? "" : b.id)} />))}
+                      </div>
+                      <Sep />
+                      <div style={{ marginTop: 10 }}>
+                        <FL>Budget Type</FL>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          {["Equal split", "Shared gift"].map(mode => (
+                            <button key={mode} onClick={() => setBudgetMode(mode)} style={{ flex: 1, padding: "10px 8px", borderRadius: 10, cursor: "pointer", border: `1.5px solid ${budgetMode === mode ? C.accent : C.border}`, background: budgetMode === mode ? C.accentL : C.card, color: budgetMode === mode ? C.accent : C.sub, fontSize: 13, fontWeight: 700, fontFamily: "inherit" }}>
+                              {mode === "Equal split" ? "💰 Equal split" : "🎁 Shared gift"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 14, padding: "14px 14px 16px", marginBottom: 12 }}>
+                      <FL>Occasion</FL>
+                      <div style={{ display: "flex", gap: 7, overflowX: "auto", paddingBottom: 6 }}>
+                        {OCCASIONS.map(o => (<Chip key={o.id} label={`${o.emoji} ${o.label}`} active={selectedOccasion === o.id && !customOcc} onClick={() => { setSelectedOccasion(x => x === o.id ? "" : o.id); setCustomOcc(""); }} />))}
+                      </div>
+                      <div style={{ marginTop: 10 }}>
+                        <FL>Custom Occasion</FL>
+                        <TInput placeholder="Ramadan, Diwali, Nowruz, Retirement..." value={customOcc} onChange={e => { setCustomOcc(e.target.value); if (e.target.value) setSelectedOccasion(""); }} />
+                      </div>
+                    </div>
+                    <button onClick={() => handleFind(g)} disabled={bulkLoading} style={{ width: "100%", padding: 15, borderRadius: 14, border: "none", background: bulkLoading ? C.accentL : C.accent, color: bulkLoading ? C.accent : "#fff", fontSize: 15, fontWeight: 900, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, transition: "all .2s" }}>
+                      {bulkLoading ? (<><span style={{ width: 16, height: 16, borderRadius: "50%", border: `2px solid ${C.accentL}`, borderTopColor: C.accent, display: "inline-block", animation: "spin .7s linear infinite" }} />Finding gifts...</>) : `🎁 Find Gifts for ${g.name}`}
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+      {confirm && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(26,23,20,.45)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:600, padding:"0 24px" }}>
+          <div style={{ background:"#fff", borderRadius:24, padding:"28px 24px 24px", width:"100%", maxWidth:300, textAlign:"center", boxShadow:"0 20px 60px rgba(0,0,0,.22)" }}>
+            <div style={{ width:56, height:56, margin:"0 auto 14px", borderRadius:16, background:"#fff5f5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:26 }}>🗑️</div>
+            <div style={{ fontSize:17, fontWeight:900, color:"#1a1714", marginBottom:8 }}>{confirm.title}</div>
+            <div style={{ fontSize:13, color:"#6b6460", marginBottom:22, lineHeight:1.55 }}>{confirm.body}</div>
+            <div style={{ display:"flex", gap:10 }}>
+              <button onClick={() => setConfirm(null)} style={{ flex:1, padding:13, borderRadius:14, border:"1.5px solid #ebe7e1", background:"#fff", color:"#6b6460", fontSize:14, fontWeight:800, cursor:"pointer", fontFamily:"inherit" }}>Cancel</button>
+              <button onClick={confirm.onYes} style={{ flex:1, padding:13, borderRadius:14, border:"none", background:"#e07070", color:"#fff", fontSize:14, fontWeight:900, cursor:"pointer", fontFamily:"inherit" }}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </Sheet>
+  );
+}
+
+
+// ─── SAVE TO GROUP SHEET ──────────────────────────────────────────────────────
+function SaveToGroupSheet({ person, groups, onSave, onClose }) {
+const [sel, setSel] = useState(null);
+const [newName, setNew] = useState("");
+const [mode, setMode] = useState("pick");
+const PRESETS = [
+{ name: "Family", emoji: "👨‍👩‍👧" },
+{ name: "Friends", emoji: "🤝" },
+{ name: "Work", emoji: "💼" },
+{ name: "Christmas", emoji: "🎄" },
+];
+const doSave = () => {
+if (mode === "pick" && sel) { onSave("existing", sel, person); }
+else if (mode === "new" && newName) {
+const preset = PRESETS.find(p => p.name === newName);
+onSave("new", { name: newName, emoji: preset?.emoji || "👥" }, person);
+}
+onClose();
+};
+const canSave = (mode === "pick" && sel) || (mode === "new" && newName);
+return (
+<Sheet onClose={onClose} title="👥 Save to Group">
+{groups.length > 0 && (
+<div style={{ marginBottom: 16 }}>
+<FL>Add to existing group</FL>
+<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+{groups.map(g => (
+<button key={g.id} onClick={() => { setSel(g.id); setMode("pick"); }} style={{
+padding: "11px 16px", borderRadius: 12, cursor: "pointer", textAlign: "left",
+border: `1.5px solid ${sel === g.id && mode === "pick" ? C.accent : C.border}`,
+background: sel === g.id && mode === "pick" ? C.accentL : C.card,
+display: "flex", alignItems: "center", gap: 10, fontFamily: "inherit",
+}}>
+<span style={{ fontSize: 20 }}>{g.emoji}</span>
+<span style={{ fontWeight: 700, color: C.text }}>{g.name}</span>
+<span style={{ fontSize: 12, color: C.muted, marginLeft: "auto" }}>{g.people.length} people</span>
+</button>
+))}
+</div>
+</div>
+)}
+<FL>Create new group</FL>
+<div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginBottom: 10 }}>
+{PRESETS.map(p => (
+<button key={p.name} onClick={() => { setNew(p.name); setMode("new"); setSel(null); }} style={{
+padding: "8px 14px", borderRadius: 10, cursor: "pointer",
+border: `1.5px solid ${newName === p.name && mode === "new" ? C.accent : C.border}`,
+background: newName === p.name && mode === "new" ? C.accentL : C.card,
+color: C.sub, fontSize: 13, fontWeight: 700, fontFamily: "inherit",
+}}>{p.emoji} {p.name}</button>
+))}
+</div>
+<div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+<TInput placeholder="Or type a custom name..." value={mode === "new" ? newName : ""}
+onChange={e => { setNew(e.target.value); setMode("new"); setSel(null); }} />
+</div>
+<button onClick={doSave} disabled={!canSave} style={{
+width: "100%", padding: 14, borderRadius: 13, border: "none",
+background: canSave ? C.accent : C.border,
+color: canSave ? "#fff" : C.muted,
+fontSize: 15, fontWeight: 800,
+cursor: canSave ? "pointer" : "not-allowed", fontFamily: "inherit",
+}}>Save Person</button>
+</Sheet>
+);
+}
+
+// ─── CALENDAR SHEET ───────────────────────────────────────────────────────────
+function CalendarSheet({ people, groups, onLoadPerson, onClose }) {
+const allPeople = [
+...people,
+...groups.flatMap(g => g.people),
+].filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i);
+
+const events = allPeople
+.filter(p => p.birthday || p.occasion)
+.flatMap(p => {
+const items = [];
+if (p.birthday) {
+const thisYear = new Date().getFullYear();
+// FIX: handle both "Jan 15 2000" and "YYYY-MM-DD" formats
+const parts = p.birthday.trim().split(/\s+/);
+let dateStr;
+if (parts.length >= 2 && MONTH_NUMS[parts[0]]) {
+const month = MONTH_NUMS[parts[0]];
+const day = (parts[1] || "1").padStart(2, "0");
+dateStr = `${thisYear}-${month}-${day}`;
+} else {
+const bd = p.birthday.slice(5); // MM-DD from YYYY-MM-DD
+dateStr = `${thisYear}-${bd}`;
+}
+if (daysUntil(dateStr) < 0) {
+dateStr = `${thisYear + 1}-${dateStr.slice(5)}`;
+}
+const rel = RELATIONS.find(r => r.id === p.relation);
+items.push({ person: p, type: "birthday", label: "Birthday", emoji: "🎂", date: dateStr, rel });
+}
+if (p.occasion && p.eventDate) {
+const occ = OCCASIONS.find(o => o.id === p.occasion);
+items.push({ person: p, type: "occasion", label: occ?.label || p.occasion, emoji: occ?.emoji || "🎉", date: p.eventDate });
+}
+return items;
+})
+.sort((a, b) => daysUntil(a.date) - daysUntil(b.date));
+
+const urgent = events.filter(e => { const d = daysUntil(e.date); return d !== null && d >= 0 && d <= 14; });
+const soon = events.filter(e => { const d = daysUntil(e.date); return d !== null && d > 14 && d <= 60; });
+const later = events.filter(e => { const d = daysUntil(e.date); return d !== null && d > 60; });
+
+const EventRow = ({ ev, i }) => {
+const d = new Date(ev.date + "T12:00:00");
+const days = daysUntil(ev.date);
+return (
+<div onClick={() => { onLoadPerson(ev.person); onClose(); }} style={{
+background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 14,
+padding: "13px 16px", cursor: "pointer",
+display: "flex", alignItems: "center", gap: 12,
+animation: `up .25s ease ${i * .05}s both`,
+}}>
+{ev.person.photo
+? <img src={ev.person.photo} style={{ width: 40, height: 40, borderRadius: 10, objectFit: "cover" }} alt="" />
+: <div style={{ width: 40, height: 40, borderRadius: 10, background: "#f5f0eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>{ev.emoji}</div>
+}
+<div style={{ flex: 1 }}>
+<div style={{ fontWeight: 800, fontSize: 14, color: C.text }}>
+{ev.person.name || ev.rel?.label} — {ev.label}
+</div>
+<div style={{ fontSize: 12, color: C.muted, marginTop: 2 }}>
+{MONTHS[d.getMonth()]} {d.getDate()}, {d.getFullYear()}
+</div>
+</div>
+<div style={{
+fontSize: 12, fontWeight: 800,
+color: days <= 7 ? "#e53935" : days <= 14 ? C.accent : C.muted,
+textAlign: "right",
+}}>
+{days === 0 ? "Today!" : days === 1 ? "Tomorrow!" : `${days}d`}
+</div>
+</div>
+);
+};
+
+const Group = ({ title, color, items }) => items.length === 0 ? null : (
+<div style={{ marginBottom: 20 }}>
+<div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.5, color, textTransform: "uppercase", marginBottom: 10 }}>{title}</div>
+<div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+{items.map((ev, i) => <EventRow key={i} ev={ev} i={i} />)}
+</div>
+</div>
+);
+
+return (
+<Sheet onClose={onClose} title="📅 Calendar">
+{events.length === 0 ? (
+<div style={{ textAlign: "center", padding: "36px 20px", color: C.muted, fontSize: 14 }}>
+<div style={{ fontSize: 40, marginBottom: 10 }}>📅</div>
+No events yet.<br />
+Add birthdays and occasions when saving people.
+</div>
+) : (
+<>
+<Group title="🔴 Coming up (next 2 weeks)" color="#e53935" items={urgent} />
+<Group title="🟡 Soon (next 2 months)" color={C.accent} items={soon} />
+<Group title="Later" color={C.muted} items={later} />
+</>
+)}
+</Sheet>
+);
+}
+
+// ─── STORES SHEET ─────────────────────────────────────────────────────────────
+function StoresSheet({ storeIds, onChange, custom, onCustomChange, onClose }) {
+const [cName, setCN] = useState("");
+const [cUrl, setCU] = useState("");
+const [adding, setA] = useState(false);
+const toggle = id => onChange(storeIds.includes(id) ? storeIds.filter(s => s !== id) : [...storeIds, id]);
+const add = () => {
+if (!cName || !cUrl) return;
+onCustomChange([...custom, { id: "c_" + uid(), label: cName, url: cUrl.startsWith("http") ? cUrl : "https://" + cUrl }]);
+setCN(""); setCU(""); setA(false);
+};
+return (
+<Sheet onClose={onClose} title="🏪 Stores">
+<div style={{ fontSize: 13, color: C.sub, marginBottom: 16 }}>
+{storeIds.length + custom.length} selected — links open directly to your chosen stores
+</div>
+{STORE_CATALOG.map(cat => (
+<div key={cat.cat} style={{ marginBottom: 16 }}>
+<FL>{cat.cat}</FL>
+<div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+{cat.stores.map(s => (
+<Chip key={s.id} label={s.label} active={storeIds.includes(s.id)} onClick={() => toggle(s.id)} />
+))}
+</div>
+</div>
+))}
+{custom.length > 0 && (
+<div style={{ marginBottom: 16 }}>
+<FL>Your Stores</FL>
+<div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+{custom.map(s => (
+<div key={s.id} style={{
+display: "flex", alignItems: "center", gap: 5,
+padding: "6px 10px 6px 13px", borderRadius: 999, background: C.accent, color: "#fff", fontSize: 13, fontWeight: 700,
+}}>
+{s.label}
+<button onClick={() => onCustomChange(custom.filter(c => c.id !== s.id))} style={{
+background: "none", border: "none", color: "#fff9", cursor: "pointer", fontFamily: "inherit", fontSize: 16, lineHeight: 1, padding: 0,
+}}>×</button>
+</div>
+))}
+</div>
+</div>
+)}
+{!adding ? (
+<button onClick={() => setA(true)} style={{
+width: "100%", padding: 13, borderRadius: 12,
+border: `2px dashed ${C.border}`, background: "transparent",
+color: C.muted, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+}}>+ Add your own store</button>
+) : (
+<div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f5f0eb", borderRadius: 14, padding: 14 }}>
+<TInput placeholder="Store name" value={cName} onChange={e => setCN(e.target.value)} />
+<TInput placeholder="Search URL: https://store.com/search?q=" value={cUrl} onChange={e => setCU(e.target.value)} />
+<div style={{ display: "flex", gap: 8 }}>
+<button onClick={add} style={{ flex: 1, padding: 11, borderRadius: 10, border: "none", background: C.accent, color: "#fff", fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>Add</button>
+<button onClick={() => setA(false)} style={{ flex: 1, padding: 11, borderRadius: 10, border: `1px solid ${C.border}`, background: C.card, color: C.sub, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Cancel</button>
+</div>
+</div>
+)}
+</Sheet>
+);
+}
+
+// ─── BULK RESULTS SHEET ───────────────────────────────────────────────────────
+function BulkResultsSheet({ data, storeIds, customStores, onClose }) {
+const { group, occasion, occasionLabel, gifts } = data;
+const [openIdx, setOpenIdx] = useState(null);
+const byPerson = group.people.map((person, pi) => ({
+person,
+gifts: gifts.filter(g => g.personIndex === pi),
+}));
+return (
+<Sheet onClose={onClose}>
+<div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+<div style={{ fontSize: 32 }}>{group.emoji}</div>
+<div>
+<div style={{ fontSize: 18, fontWeight: 900, color: C.text }}>{group.name}</div>
+{/* FIX: show occasionLabel (handles both preset and custom occasions) */}
+{occasionLabel && (
+<div style={{ fontSize: 13, color: C.accent, fontWeight: 700 }}>
+{occasion?.emoji || "🎉"} {occasionLabel} · {gifts.length} gift ideas
+</div>
+)}
+</div>
+</div>
+<div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+{byPerson.map(({ person, gifts: pg }, pi) => {
+const rel = RELATIONS.find(r => r.id === person.relation);
+return (
+<div key={pi}>
+<div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+{person.photo
+? <img src={person.photo} style={{ width: 36, height: 36, borderRadius: 10, objectFit: "cover" }} alt="" />
+: <div style={{ width: 36, height: 36, borderRadius: 10, background: C.accentL, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{rel?.emoji}</div>
+}
+<div style={{ fontWeight: 800, fontSize: 15, color: C.text }}>
+{person.name || rel?.label}
+</div>
+{person.age && (
+<span style={{ fontSize: 11, background: "#f5f0eb", color: C.sub, borderRadius: 6, padding: "2px 8px", fontWeight: 700 }}>{person.age}</span>
+)}
+</div>
+<div style={{ display: "flex", flexDirection: "column", gap: 8, paddingLeft: 8 }}>
+{pg.map((gift, gi) => {
+const key = `${pi}-${gi}`;
+const open = openIdx === key;
+const links = mkLinks(gift.searchQuery || gift.title, storeIds, customStores);
+return (
+<div key={gi} style={{
+background: C.card, border: `1.5px solid ${C.border}`,
+borderRadius: 14, overflow: "hidden",
+borderLeft: `3px solid ${C.accent}`,
+}}>
+<div onClick={() => setOpenIdx(open ? null : key)} style={{
+padding: "12px 14px", cursor: "pointer",
+display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+}}>
+<div style={{ flex: 1 }}>
+<div style={{ fontSize: 14, fontWeight: 800, color: C.text, lineHeight: 1.3 }}>{gift.title}</div>
+<div style={{ fontSize: 11, color: C.accent, fontWeight: 700, marginTop: 3 }}>↗ {gift.trendReason}</div>
+</div>
+<span style={{ color: C.muted, fontSize: 11, flexShrink: 0, marginLeft: 8 }}>{open ? "▲" : "▼"}</span>
+</div>
+{open && (
+<div style={{ padding: "0 14px 12px", borderTop: `1px solid ${C.border}` }}>
+<p style={{ fontSize: 12, color: C.sub, lineHeight: 1.6, marginBottom: 10, marginTop: 10 }}>{gift.description}</p>
+<div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+{links.map((lk, li) => (
+<a key={li} href={lk.url} target="_blank" rel="noreferrer" style={{
+padding: "6px 12px", background: C.accent, color: "#fff",
+borderRadius: 8, fontSize: 11, fontWeight: 800, textDecoration: "none",
+}}>🛍 {lk.label}</a>
+))}
+</div>
+</div>
+)}
+</div>
+);
+})}
+</div>
+</div>
+);
+})}
+</div>
+</Sheet>
+);
+}
+
+// ─── MAIN APP ─────────────────────────────────────────────────────────────────
+export default function App() {
+const [relation, setRelation] = useState("");
+const [forMe, setForMe] = useState(false);
+const [name, setName] = useState("");
+const [photo, setPhoto] = useState(null);
+const [age, setAge] = useState("");
+const [birthday, setBirthday] = useState("");
+const [bdMonth, setBdMonth] = useState("");
+const [bdDay, setBdDay] = useState("");
+const [bdYear, setBdYear] = useState("");
+const [occasion, setOccasion] = useState("");
+const [customOccasion, setCustomOccasion] = useState("");
+const [eventDate, setEventDate] = useState("");
+const [evMonth, setEvMonth] = useState("");
+const [evDay, setEvDay] = useState("");
+const [evYear, setEvYear] = useState("");
+const [budget, setBudget] = useState("");
+const [interests, setInterests] = useState("");
+
+// ── localStorage helpers ──
+const load = (key, def) => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; } };
+const save = (key, val) => { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} };
+
+const [results, setResults] = useState([]);
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState(null);
+const [storeIds, setStoreIds] = useState(() => load("pw_stores", DEFAULT_STORES));
+// FIX: customStores now persisted in localStorage
+const [customStores, setCustomStores] = useState(() => load("pw_custom_stores", []));
+const [groups, setGroups] = useState(() => load("pw_groups", []));
+const [people, setPeople] = useState(() => load("pw_people", []));
+const [wishList, setWishList] = useState(() => load("pw_wishlist", []));
+const [resultsCount, setResultsCount] = useState(4);
+const [sortMode, setSortMode] = useState("trending");
+  const [showMyPeople, setShowMyPeople] = useState(false);
+  const [confirmPerson, setConfirmPerson] = useState(null);
+  const [confirmDeletePerson, setConfirmDeletePerson] = useState(null);
+const [myName, setMyName] = useState(() => load("pw_myname", ""));
+const [myBdMonth, setMyBdMonth] = useState(() => load("pw_mybdm", ""));
+// FIX: myBdDay now loads from localStorage
+const [myBdDay, setMyBdDay] = useState(() => load("pw_mybdd", ""));
+const [myBdYear, setMyBdYear] = useState(() => load("pw_mybdy", ""));
+const [saved, setSaved] = useState(false);
+const [sheet, setSheet] = useState(null);
+const [savedMatches, setSavedMatches] = useState([]);
+const [bulkResults, setBulkResults] = useState(null);
+const [bulkLoading, setBulkLoading] = useState(false);
+
+// ── Persisted setters ──
+const setGroupsP = v => { const val = typeof v === "function" ? v(groups) : v; setGroups(val); save("pw_groups", val); };
+const setPeopleP = v => { const val = typeof v === "function" ? v(people) : v; setPeople(val); save("pw_people", val); };
+const setWishP = v => { const val = typeof v === "function" ? v(wishList) : v; setWishList(val); save("pw_wishlist", val); };
+const setStoreP = v => { const val = typeof v === "function" ? v(storeIds) : v; setStoreIds(val); save("pw_stores", val); };
+// FIX: customStores setter now persists
+const setCustomStoresP = v => { const val = typeof v === "function" ? v(customStores) : v; setCustomStores(val); save("pw_custom_stores", val); };
+// FIX: myName setter no longer calls itself recursively
+const setMyNameP = v => { setMyName(v); save("pw_myname", v); };
+const setMyBdMP = v => { setMyBdMonth(v); save("pw_mybdm", v); };
+const setMyBdDP = v => { setMyBdDay(v); save("pw_mybdd", v); };
+const setMyBdYP = v => { setMyBdYear(v); save("pw_mybdy", v); };
+const trashBtnStyle = {
+  background: "none",
+  border: "none",
+  cursor: "pointer",
+  padding: "6px 8px",
+  borderRadius: 8,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: 0,
+};
+
+const deleteGroupById = (groupId) => {
+  if (!window.confirm("Delete this group? People will stay in My People.")) return;
+  setGroupsP(gs => gs.filter(g => g.id !== groupId));
+};
+
+const deletePersonFromGroup = (groupId, personId) => {
+  if (!window.confirm("Remove this person from this group?")) return;
+  setGroupsP(gs => gs.map(g =>
+    g.id === groupId
+      ? { ...g, people: g.people.filter(p => p.id !== personId) }
+      : g
+  ));
+};
+
+const deletePersonEverywhere = (personId) => {
+  if (!window.confirm("Delete this person from My People and all groups?")) return;
+  setPeopleP(ps => ps.filter(p => p.id !== personId));
+  setGroupsP(gs => gs.map(g => ({
+    ...g,
+    people: g.people.filter(p => p.id !== personId)
+  })));
+};
+
+
+const rel = RELATIONS.find(r => r.id === relation);
+const occ = OCCASIONS.find(o => o.id === occasion);
+const bud = BUDGETS.find(b => b.id === budget);
+
+const reset = () => {
+setRelation(""); setForMe(false); setName(""); setPhoto(null);
+setAge(""); setBirthday(""); setBdMonth(""); setBdDay(""); setBdYear("");
+setOccasion(""); setEventDate(""); setEvMonth(""); setEvDay(""); setEvYear("");
+setBudget(""); setInterests(""); setResults([]); setSaved(false);
+};
+
+const loadPerson = p => {
+setRelation(p.relation || "");
+setForMe(p.relation === "myself");
+setName(p.name || "");
+setPhoto(p.photo || null);
+setAge(p.age || "");
+setBirthday(p.birthday || "");
+setBdMonth(""); setBdDay(""); setBdYear("");
+setOccasion(p.occasion || "");
+setEventDate(p.eventDate || "");
+setBudget(p.budget || "");
+setInterests(p.interests || "");
+setResults([]); setSaved(false);
+window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+const findSaved = (relId) => {
+const all = [...people, ...groups.flatMap(g => g.people)]
+.filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i);
+return all.filter(p => p.relation === relId);
+};
+
+const currentPerson = () => ({
+id: uid(), relation, name, photo, age,
+birthday: [bdMonth, bdDay, bdYear].filter(Boolean).join(" "),
+occasion, eventDate, budget, interests,
+});
+
+const addToWishList = (gift, links) => {
+setWishP(prev =>
+prev.find(x => x.title === gift.title)
+? prev.filter(x => x.title !== gift.title)
+: [...prev, { ...gift, id: uid(), storeLinks: links }]
+);
+};
+
+const saveToGroup = (mode, groupData, person) => {
+if (mode === "existing") {
+setGroupsP(gs => gs.map(g =>
+g.id === groupData
+? { ...g, people: [...g.people.filter(p => p.id !== person.id), person] }
+: g
+));
+} else {
+setGroupsP(gs => [...gs, { id: uid(), ...groupData, people: [person] }]);
+}
+setPeopleP(prev => prev.find(p => p.id === person.id) ? prev : [...prev, person]);
+setSaved(true);
+};
+
+const buildPrompt = () => {
+const storeNames = [
+...ALL_STORES.filter(s => storeIds.includes(s.id)).map(s => s.label),
+...customStores.map(s => s.label),
+].join(", ") || "Amazon";
+const who = forMe ? "the user themselves (for their own wish list)" : `${rel?.label || "someone"}, interested in: ${interests || "general"}`;
+return `You are a US gift trend expert for 2026. Preferred stores: ${storeNames}. Return ONLY valid JSON. Find gifts for: ${who}, age ${age || "unknown"}, budget ${bud?.label || "flexible"}${occ ? `, occasion: ${occ.label}` : ""}. Return ${resultsCount} trending gift ideas. Each: { "title": "Gift name", "searchQuery": "3-5 word search phrase", "trendReason": "Why trending in 2026 (max 8 words)", "description": "Why they will love it (2 sentences)", "category": "one of: Fashion, Tech, Home, Beauty, Food, Sports, Gaming, Books, Experience, Other", "priceHint": "one of: Budget, Mid-range, Premium, Luxury", "matchScore": 85 } Format: { "gifts": [ ... ] }`;
+};
+
+const findGifts = async () => {
+if (!relation && !forMe) { setError("Select who this gift is for."); return; }
+setError(null); setLoading(true); setResults([]); setSaved(false);
+try {
+const res = await fetch("https://api.anthropic.com/v1/messages", {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+// ⬇️ ДОБАВЬ СВОЙ API КЛЮЧ ЗДЕСЬ:
+"x-api-key": "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",
+"anthropic-version": "2023-06-01",
+"anthropic-dangerous-direct-browser-access": "true",
+},
+body: JSON.stringify({
+model: "claude-sonnet-4-5",
+max_tokens: 2000,
+messages: [{ role: "user", content: buildPrompt() }],
+}),
+});
+const data = await res.json();
+if (data.error) throw new Error(data.error.message);
+const text = data.content.map(c => c.text || "").join("");
+const parsed = JSON.parse(text.replace(/`json|`/g, "").trim());
+setResults((parsed.gifts || []).map(g => ({ ...g, budget })));
+setSortMode("trending");
+} catch (e) {
+setError("Something went wrong. Check your API key and try again.");
+console.error(e);
+} finally {
+setLoading(false);
+}
+};
+
+const hasSelection = relation || forMe;
+const isForMe = forMe && !relation;
+
+const upcomingCount = [...people, ...groups.flatMap(g => g.people)]
+.filter((p, i, arr) => arr.findIndex(x => x.id === p.id) === i)
+.filter(p => {
+const d = daysUntil(p.birthday);
+return d !== null && d >= 0 && d <= 30;
+}).length;
+
+const findGiftsForGroup = async (group, occasionId, customLabel, groupBudgetId) => {
+if (!group.people.length) return;
+setBulkLoading(true);
+setBulkResults(null);
+const storeNames = [
+...ALL_STORES.filter(s => storeIds.includes(s.id)).map(s => s.label),
+...customStores.map(s => s.label),
+].join(", ") || "Amazon";
+const occObj = OCCASIONS.find(o => o.id === occasionId);
+// FIX: occasionLabel properly handles both preset and custom occasions
+const occasionLabel = customLabel || occObj?.label || "Gift";
+const list = group.people.map((p, i) => {
+const rel = RELATIONS.find(r => r.id === p.relation);
+const groupBudObj = BUDGETS.find(b => b.id === groupBudgetId);
+      const bud = groupBudObj || BUDGETS.find(b => b.id === p.budget);
+return `${i}. ${rel?.label || "Person"}${p.name ? " (" + p.name + ")" : ""}, age ${p.age || "unknown"}, budget ${bud?.label || "flexible"}${p.interests ? ", likes: " + p.interests : ""}`;
+}).join("\n");
+const prompt = `You are a US gift trend expert for 2026. Preferred stores: ${storeNames}. Return ONLY valid JSON. Find 2 trending gift ideas for each person: ${list} Each idea: { "personIndex": 0, "title": "Gift name", "searchQuery": "3-5 word search phrase", "trendReason": "Why trending in 2026 (max 8 words)", "description": "Why they will love it (2 sentences)", "category": "Fashion, Tech, Home, Beauty, Food, Sports, Gaming, Books, Experience, or Other", "priceHint": "Budget, Mid-range, Premium, or Luxury" } Format: { "gifts": [ ... ] }`;
+try {
+const res = await fetch("https://api.anthropic.com/v1/messages", {
+method: "POST",
+headers: {
+"Content-Type": "application/json",
+// ⬇️ ДОБАВЬ СВОЙ API КЛЮЧ ЗДЕСЬ:
+"x-api-key": "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",
+"anthropic-version": "2023-06-01",
+"anthropic-dangerous-direct-browser-access": "true",
+},
+body: JSON.stringify({ model: "claude-sonnet-4-5", max_tokens: 2000, messages: [{ role: "user", content: prompt }] }),
+});
+const data = await res.json();
+if (data.error) throw new Error(data.error.message);
+const text = data.content.map(c => c.text || "").join("");
+const parsed = JSON.parse(text.replace(/`json|`/g, "").trim());
+const mapped = (parsed.gifts || []).map(g => ({
+...g,
+person: group.people[g.personIndex],
+budget: group.people[g.personIndex]?.budget || "",
+}));
+// FIX: pass occasionLabel to BulkResultsSheet
+setBulkResults({ group, occasion: occObj, occasionLabel, gifts: mapped });
+setSheet(null);
+} catch(e) {
+console.error(e);
+} finally {
+setBulkLoading(false);
+}
+};
+
+return (
+<>
+<style>{css}</style>
+<div className="pw-app" style={{ minHeight: "100vh", background: C.bg, maxWidth: 680, margin: "0 auto", padding: "0 0 40px" }}>
+{/* ── HEADER ── */}
+<div style={{ padding: "52px 20px 20px" }}>
+<div style={{ marginBottom: 4, display: "flex", alignItems: "center", gap: 14 }}>
+<img src={LOGO_IMG} alt="Pickwell" style={{ height: 52, width: 52, objectFit: "contain", borderRadius: 12 }} />
+<div>
+<div style={{ fontSize: 26, fontWeight: 900, color: C.text, lineHeight: 1.15 }}>Pickwell</div>
+<div style={{ fontSize: 12, color: C.accent, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Find the perfect gift</div>
+</div>
+</div>
+
+
+      {/* ── 4-BUTTON NAV ── */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, marginTop: 20 }}>
+        {[
+          { id: "wishlist", Icon: Icon.WishList, label: wishList.length > 0 ? `${wishList.length} saved` : "Wish List", active: wishList.length > 0, activeBg: "#fdf0eb", labelColor: ICON_COLOR.wish },
+          { id: "groups", Icon: Icon.Groups, label: groups.length > 0 ? `${groups.length} groups` : "Groups", active: false, activeBg: "#f5ede8", labelColor: ICON_COLOR.groups },
+          { id: "calendar", Icon: Icon.Calendar, label: upcomingCount > 0 ? `${upcomingCount} soon` : "Calendar", active: upcomingCount > 0, activeBg: "#fdf0eb", labelColor: ICON_COLOR.calendar },
+          { id: "stores", Icon: Icon.Stores, label: `${storeIds.length + customStores.length} stores`, active: false, activeBg: "#f5ede8", labelColor: ICON_COLOR.stores },
+        ].map(btn => (
+          <button key={btn.id} onClick={() => setSheet(btn.id)} style={{
+            padding: "12px 6px", borderRadius: 14, cursor: "pointer",
+            border: `1.5px solid ${btn.active ? btn.labelColor + "44" : C.border}`,
+            background: btn.active ? btn.activeBg : C.card,
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 5,
+            transition: "all .18s",
+          }}>
+            <btn.Icon />
+            <span style={{ fontSize: 10, fontWeight: 800, color: btn.labelColor, textAlign: "center", lineHeight: 1.2 }}>{btn.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* ── SEARCH FORM ── */}
+    <div style={{ padding: "0 20px" }}>
+      <div style={{
+        background: C.card, border: `1.5px solid ${C.border}`,
+        borderRadius: 20, padding: "18px 18px 20px",
+        animation: "up .3s ease",
+      }}>
+        {/* WHO */}
+            {showMyPeople && (
+              <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.4)", zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ background: C.card, borderRadius: 20, padding: 24, width: 340, maxHeight: "80vh", overflowY: "auto" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                    <div style={{ fontWeight: 800, fontSize: 16 }}>👥 My People</div>
+                    <button onClick={() => setShowMyPeople(false)} style={{ background: "none", border: "none", fontSize: 20, cursor: "pointer" }}>✕</button>
+                  </div>
+                  {people.length === 0 && <div style={{ color: C.sub, fontSize: 13 }}>No saved people yet</div>}
+                  {people.map(p => (
+                    <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
+                      <div onClick={() => { loadPerson(p); setShowMyPeople(false); }} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flex: 1 }}>
+                        {p.photo ? <img src={p.photo} style={{ width: 36, height: 36, borderRadius: 10, objectFit: "cover" }} alt="" /> : <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f5f0eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>👤</div>}
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 14 }}>{p.name || "Unnamed"}</div>
+                          <div style={{ fontSize: 12, color: C.sub }}>{p.age}{p.relation ? ` · ${p.relation}` : ""}</div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => deletePersonEverywhere(p.id)}
+                        style={trashBtnStyle}
+                        title="Delete person"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 22 22" fill="none">
+                <path d="M6 6h10" stroke="#e07070" strokeWidth="1.8" strokeLinecap="round"/>
+                <path d="M9 6V4.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V6" stroke="#e07070" strokeWidth="1.5" strokeLinecap="round"/>
+                <rect x="6.5" y="7" width="9" height="11" rx="1.5" stroke="#e07070" strokeWidth="1.5"/>
+                <path d="M9 10v5M11 10v5M13 10v5" stroke="#e07070" strokeWidth="1.3" strokeLinecap="round"/>
+              </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}><div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.5, color: C.muted, textTransform: "uppercase" }}>Who is the gift for?</div><button onClick={() => setShowMyPeople(true)} style={{ fontSize: 11, color: C.accent, background: C.accentL, border: "1.5px solid #c2714f44", borderRadius: 20, cursor: "pointer", fontWeight: 800, padding: "5px 12px", fontFamily: "inherit" }} style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.5, color: C.accent, textTransform: "uppercase", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>My People</button></div>
+        <div style={{ display: "flex", gap: 7, overflowX: "auto", paddingBottom: 6, marginBottom: 4 }}>
+          {RELATIONS.map(r => {
+            const isForMeBtn = r.id === "myself";
+            const isActive = isForMeBtn ? forMe : relation === r.id;
+            return (
+              <button key={r.id} onClick={() => {
+                if (isForMeBtn) { setForMe(f => !f); setRelation(""); setSavedMatches([]); }
+                else {
+                  const newRel = relation === r.id ? "" : r.id;
+                  setRelation(newRel); setForMe(false); setResults([]); setName(""); setPhoto(null);
+                  if (newRel) { setSavedMatches(findSaved(newRel)); } else { setSavedMatches([]); }
+                }
+              }} style={{
+                padding: "7px 14px", borderRadius: 999, flexShrink: 0, cursor: "pointer",
+                border: `1.5px solid ${isActive ? (isForMeBtn ? C.gold : C.accent) : C.border}`,
+                background: isActive ? (isForMeBtn ? C.goldL : C.accentL) : "transparent",
+                color: isActive ? (isForMeBtn ? C.gold : C.accent) : C.sub,
+                fontSize: 13, fontWeight: 700, fontFamily: "inherit",
+                whiteSpace: "nowrap", transition: "all .13s",
+              }}>{r.emoji} {r.label}</button>
+            );
+          })}
+        </div>
+
+        {/* Quick load */}
+        {savedMatches.length > 0 && (
+          <div style={{ marginTop: 10, marginBottom: 4 }}>
+            <div style={{ fontSize: 10, fontWeight: 800, color: C.accent, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Saved — tap to load</div>
+            <div style={{ display: "flex", gap: 7, overflowX: "auto", paddingBottom: 4 }}>
+              {savedMatches.map(p => (
+                <button key={p.id} onClick={() => { loadPerson(p); setSavedMatches([]); }} style={{
+                  display: "flex", alignItems: "center", gap: 8, flexShrink: 0,
+                  padding: "8px 14px", borderRadius: 12,
+                  border: `1.5px solid ${C.accent}`, background: C.accentL,
+                  cursor: "pointer", fontFamily: "inherit",
+                }}>
+                  {p.photo
+                    ? <img src={p.photo} style={{ width: 28, height: 28, borderRadius: 7, objectFit: "cover" }} alt="" />
+                    : <span style={{ fontSize: 18 }}>{RELATIONS.find(r => r.id === p.relation)?.emoji}</span>
+                  }
+                  <div style={{ textAlign: "left" }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: C.accent }}>{p.name || RELATIONS.find(r => r.id === p.relation)?.label}</div>
+                    {p.age && <div style={{ fontSize: 11, color: C.sub }}>{p.age}</div>}
+                  </div>
+                </button>
+              ))}
+              <button onClick={() => setSavedMatches([])} style={{
+                flexShrink: 0, padding: "8px 12px", borderRadius: 12,
+                border: `1.5px solid ${C.border}`, background: "transparent",
+                cursor: "pointer", fontSize: 12, color: C.muted, fontFamily: "inherit", fontWeight: 700,
+              }}>Fill new</button>
+            </div>
+          </div>
+        )}
+
+        {hasSelection && (
+          <>
+            <Sep />
+            {!forMe && (
+              <div style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 16, marginBottom: 16 }}>
+                <PhotoPicker photo={photo} onPhoto={setPhoto} />
+                <div style={{ flex: 1 }}>
+                  <FL>Name (optional)</FL>
+
+                    {relation === "pet" && (
+                      <div style={{ marginTop: 12, marginBottom: 16 }}>
+                        <FL>Pet Type</FL>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 10 }}>
+                          {["🐶 Dog","🐱 Cat","🐦 Bird","🐹 Small Pet","🐟 Fish","🐾 Other"].map(t => (
+                            <Chip key={t} label={t} active={interests.includes(t)} onClick={() =>
+                              setInterests(p =>
+                                p.includes(t)
+                                  ? p.replace(", "+t,"").replace(t+", ","").replace(t,"")
+                                  : p ? p+", "+t : t
+                              )
+                            } />
+                          ))}
+                        </div>
+
+                        <FL>Pet Personality</FL>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                          {["Playful","Calm","Active","Senior","Luxury","Funny"].map(t => (
+                            <Chip key={t} label={t} active={interests.includes(t)} onClick={() =>
+                              setInterests(p =>
+                                p.includes(t)
+                                  ? p.replace(", "+t,"").replace(t+", ","").replace(t,"")
+                                  : p ? p+", "+t : t
+                              )
+                            } />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  <TInput
+                    placeholder={relation === "custom" ? "e.g. Employee, Neighbor..." : `e.g. ${rel?.label || ""}...`}
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+            {forMe && (
+              <div style={{ marginTop: 16, marginBottom: 16 }}>
+                <FL>Your Name</FL>
+                <TInput placeholder="e.g. Anna, Jake..." value={myName} onChange={e => setMyNameP(e.target.value)} />
+                <div style={{ marginTop: 12 }}>
+                  <FL>Your Birthday (optional)</FL>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[
+                      { key: "m", placeholder: "Month", opts: MONTHS },
+                      { key: "d", placeholder: "Day", opts: Array.from({length:31},(_,i) => String(i+1)) },
+                      { key: "y", placeholder: "Year", opts: Array.from({length:80},(_,i) => String(new Date().getFullYear() - i)) },
+                    ].map(f => (
+                      <select key={f.key}
+                        value={f.key==="m" ? myBdMonth : f.key==="d" ? myBdDay : myBdYear}
+                        onChange={e => {
+                          if (f.key==="m") setMyBdMP(e.target.value);
+                          if (f.key==="d") setMyBdDP(e.target.value);
+                          if (f.key==="y") setMyBdYP(e.target.value);
+                        }}
+                        style={{
+                          flex: f.key==="y" ? 1.4 : 1, padding: "11px 8px", fontSize: 14,
+                          border: `1.5px solid ${C.border}`, borderRadius: 12,
+                          background: C.card, color: C.text, fontFamily: "inherit", outline: "none",
+                          appearance: "none", WebkitAppearance: "none", textAlign: "center",
+                        }}>
+                        <option value="">{f.placeholder}</option>
+                        {f.opts.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!forMe && (
+              <>
+                <Sep />
+                <div style={{ marginTop: 16, marginBottom: 16 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                    <FL>Birthday</FL>
+                    {(bdMonth || bdDay || bdYear) && (
+                      <button onClick={() => { setBdMonth(""); setBdDay(""); setBdYear(""); }} style={{
+                        background: "none", border: "none", fontSize: 11,
+                        color: C.muted, cursor: "pointer", fontFamily: "inherit", fontWeight: 700,
+                      }}>Clear</button>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[
+                      { key: "bMonth", placeholder: "Month", opts: MONTHS },
+                      { key: "bDay", placeholder: "Day", opts: Array.from({length:31},(_,i) => String(i+1)) },
+                      { key: "bYear", placeholder: "Year", opts: Array.from({length:80},(_,i) => String(new Date().getFullYear() - i)) },
+                    ].map(f => (
+                      <select key={f.key}
+                        value={f.key === "bMonth" ? bdMonth : f.key === "bDay" ? bdDay : bdYear}
+                        onChange={e => {
+                          if (f.key === "bMonth") setBdMonth(e.target.value);
+                          if (f.key === "bDay") setBdDay(e.target.value);
+                          if (f.key === "bYear") setBdYear(e.target.value);
+                          setAge("");
+                        }}
+                        style={{
+                          flex: f.key === "bYear" ? 1.4 : 1, padding: "11px 8px", fontSize: 14,
+                          border: `1.5px solid ${C.border}`, borderRadius: 12,
+                          background: C.card, color: C.text, fontFamily: "inherit", outline: "none",
+                          appearance: "none", WebkitAppearance: "none", textAlign: "center",
+                        }}>
+                        <option value="">{f.placeholder}</option>
+                        {f.opts.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    ))}
+                  </div>
+                  {!bdMonth && !bdYear && !bdDay && (
+                    <div style={{ marginTop: 12 }}>
+                      <div style={{ fontSize: 11, color: C.muted, fontWeight: 700, marginBottom: 8 }}>OR SELECT AGE RANGE</div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                        {AGES.map(a => (
+                          <Chip key={a} label={a} active={age === a} onClick={() => setAge(x => x === a ? "" : a)} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            {forMe && (
+              <>
+                <Sep />
+                <div style={{ marginTop: 16, marginBottom: 16 }}>
+                  <FL>Age Range</FL>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                    {AGES.map(a => (
+                      <Chip key={a} label={a} active={age === a} onClick={() => setAge(x => x === a ? "" : a)} />
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            <Sep />
+            <div style={{ marginTop: 16, marginBottom: occasion ? 12 : 16 }}>
+              <FL>Occasion</FL>
+              <div style={{ display: "flex", gap: 7, overflowX: "auto", paddingBottom: 4, marginBottom: 4 }}>
+                {OCCASIONS.map(o => (
+                  <Chip key={o.id} label={`${o.emoji} ${o.label}`} active={occasion === o.id}
+                    onClick={() => { setOccasion(x => x === o.id ? "" : o.id); setEventDate(""); setEvMonth(""); setEvDay(""); setEvYear(""); }} />
+                ))}
+              </div>
+            </div>
+
+            {occasion && (
+              <div style={{ marginBottom: 16 }}>
+                <FL>Event Date</FL>
+                <div style={{ display: "flex", gap: 8 }}>
+                  {[
+                    { key: "em", placeholder: "Month", opts: MONTHS },
+                    { key: "ed", placeholder: "Day", opts: Array.from({length:31},(_,i) => String(i+1)) },
+                    { key: "ey", placeholder: "Year", opts: ["2025","2026","2027","2028"] },
+                  ].map(f => (
+                    <select key={f.key}
+                      value={f.key==="em" ? evMonth : f.key==="ed" ? evDay : evYear}
+                      onChange={e => {
+                        if (f.key==="em") setEvMonth(e.target.value);
+                        if (f.key==="ed") setEvDay(e.target.value);
+                        if (f.key==="ey") setEvYear(e.target.value);
+                        setEventDate([
+                          f.key==="em" ? e.target.value : evMonth,
+                          f.key==="ed" ? e.target.value : evDay,
+                          f.key==="ey" ? e.target.value : evYear,
+                        ].filter(Boolean).join(" "));
+                      }}
+                      style={{
+                        flex: f.key==="ey" ? 1.4 : 1, padding: "10px 8px", fontSize: 14,
+                        border: `1.5px solid ${C.border}`, borderRadius: 12,
+                        background: C.card, color: C.text, fontFamily: "inherit", outline: "none",
+                        appearance: "none", WebkitAppearance: "none", textAlign: "center",
+                      }}>
+                      <option value="">{f.placeholder}</option>
+                      {f.opts.map(o => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <Sep />
+            <div style={{ marginTop: 16, marginBottom: 16 }}>
+              <FL>Budget</FL>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                {BUDGETS.map(b => (
+                  <Chip key={b.id} label={b.label} active={budget === b.id} onClick={() => setBudget(x => x === b.id ? "" : b.id)} />
+                ))}
+              </div>
+            </div>
+
+            <Sep />
+            <div style={{ marginTop: 16, marginBottom: 16 }}>
+              <FL>Interests & Hobbies</FL>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
+                    {[
+                      "Cooking","Gardening","Reading","Fishing","Golf",
+                      "Walking","Travel","Coffee","BBQ","Tools",
+                      "Music","Movies","Fitness","Tech","DIY",
+                      "Art","Pets","Camping","History","Comfort"
+                    ].map(tag => (
+                      <Chip
+                        key={tag}
+                        label={tag}
+                        active={interests.split(", ").includes(tag)}
+                        onClick={() =>
+                          setInterests(prev => {
+                            const arr = prev ? prev.split(", ").filter(Boolean) : [];
+                            return arr.includes(tag)
+                              ? arr.filter(x => x !== tag).join(", ")
+                              : [...arr, tag].join(", ");
+                          })
+                        }
+                      />
+                    ))}
+                  </div>
+              <TInput
+                placeholder="hiking, gaming, skincare, cooking..."
+                value={interests}
+                onChange={e => setInterests(e.target.value)}
+              />
+            </div>
+
+            <Sep />
+            <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
+              <button onClick={() => setSheet("saveGroup")} style={{
+                flex: 1, padding: "9px 12px", borderRadius: 10,
+                border: `1.5px solid ${C.border}`, background: "#f5f0eb",
+                color: C.accent, fontSize: 13, fontWeight: 800,
+                cursor: "pointer", fontFamily: "inherit",
+              }}>
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style={{display:"inline",verticalAlign:"middle",marginRight:5}}>
+                  <circle cx="6" cy="4.5" r="2.2" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M1 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M12 7v4M10 9h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>Add to Group</button>
+              <button onClick={() => setSheet("createGroup")} style={{
+                flex: 1, padding: "9px 12px", borderRadius: 10,
+                border: `1.5px solid ${C.border}`, background: "#f5f0eb",
+                color: C.sub, fontSize: 13, fontWeight: 800,
+                cursor: "pointer", fontFamily: "inherit",
+              }}>＋ New Group</button>
+            </div>
+          </>
+        )}
+      </div>
+
+      {hasSelection && (
+        <div style={{ marginBottom: 14, marginTop: 16, display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: C.muted, whiteSpace: "nowrap" }}>IDEAS TO SHOW</div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {[2, 4, 6, 10].map(n => (
+              <button key={n} onClick={() => setResultsCount(n)} style={{
+                width: 36, height: 36, borderRadius: 10, cursor: "pointer",
+                border: `1.5px solid ${resultsCount === n ? C.accent : C.border}`,
+                background: resultsCount === n ? C.accentL : C.card,
+                color: resultsCount === n ? C.accent : C.sub,
+                fontSize: 13, fontWeight: 800, fontFamily: "inherit", transition: "all .13s",
+              }}>{n}</button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div style={{ color: "#e53935", fontSize: 13, fontWeight: 700, margin: "10px 0", padding: "10px 14px", background: "#fff5f5", borderRadius: 10, border: "1px solid #ffcdd2" }}>{error}</div>
+      )}
+
+      <button onClick={findGifts} disabled={loading || !hasSelection} style={{
+        width: "100%", padding: 15, borderRadius: 14, border: "none",
+        background: !hasSelection ? C.border : loading ? C.accentL : C.accent,
+        color: !hasSelection ? C.muted : loading ? C.accent : "#fff",
+        fontSize: 16, fontWeight: 900,
+        cursor: !hasSelection || loading ? "not-allowed" : "pointer",
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+        margin: "14px 0 24px", transition: "all .2s", fontFamily: "inherit",
+        boxShadow: hasSelection && !loading ? "0 4px 20px rgba(194,113,79,.3)" : "none",
+      }}>
+        {loading ? (
+          <>
+            <span style={{
+              width: 18, height: 18, borderRadius: "50%",
+              border: `2px solid ${C.accentL}`, borderTopColor: C.accent,
+              display: "inline-block", animation: "spin .7s linear infinite",
+            }} />
+            Finding gifts...
+          </>
+        ) : `🎁 Find Gift${forMe ? " for Me" : rel ? ` for ${name || rel.label}` : ""}`}
+      </button>
+
+      {results.length > 0 && (
+        <div style={{ animation: "up .3s ease" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <div style={{ fontSize: 15, fontWeight: 800, color: C.text }}>
+              {results.length} ideas {forMe ? "for you" : `for ${name || rel?.label}`}
+            </div>
+            <button onClick={reset} style={{ background: "none", border: "none", fontSize: 12, color: C.muted, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>New search</button>
+          </div>
+          <div style={{ display: "flex", background: "#ede9e3", borderRadius: 12, padding: 3, marginBottom: 14 }}>
+            {[
+              { id: "trending", label: "🔥 Trending" },
+              { id: "price", label: "💰 Price" },
+              { id: "match", label: "⭐ Match" },
+            ].map(tab => (
+              <button key={tab.id} onClick={() => setSortMode(tab.id)} style={{
+                flex: 1, padding: "8px 4px", borderRadius: 9, border: "none",
+                cursor: "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: 800,
+                background: sortMode === tab.id ? C.card : "transparent",
+                color: sortMode === tab.id ? C.accent : C.muted,
+                boxShadow: sortMode === tab.id ? "0 1px 4px rgba(0,0,0,.08)" : "none",
+                transition: "all .15s",
+              }}>{tab.label}</button>
+            ))}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+            {[...results].sort((a,b) => {
+              if (sortMode === "price") {
+                const order = { Budget:1, "Mid-range":2, Premium:3, Luxury:4 };
+                return (order[a.priceHint]||2) - (order[b.priceHint]||2);
+              }
+              if (sortMode === "match") return (b.matchScore||0) - (a.matchScore||0);
+              return 0;
+            }).map((g, i) => (
+              <GiftCard key={i} gift={g} idx={i}
+                storeIds={storeIds} customStores={customStores}
+                onWish={forMe ? addToWishList : null}
+                isWished={wishList.some(w => w.title === g.title)} />
+            ))}
+          </div>
+          {!forMe && (
+            !saved ? (
+              <button onClick={() => setSheet("saveGroup")} style={{
+                width: "100%", padding: 13, borderRadius: 13,
+                border: `1.5px solid ${C.border}`, background: C.card, color: C.sub,
+                fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: "inherit",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              }}>
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" style={{display:"inline",verticalAlign:"middle",marginRight:5}}>
+                  <circle cx="6" cy="4.5" r="2.2" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M1 13c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                  <path d="M12 7v4M10 9h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>Save {name || rel?.label} to a Group</button>
+            ) : (
+              <div style={{
+                padding: 13, borderRadius: 13, background: "#e8f5e9",
+                border: "1.5px solid #a5d6a7", textAlign: "center",
+                fontSize: 13, fontWeight: 700, color: "#388e3c",
+              }}>✓ Saved to group!</div>
+            )
+          )}
+        </div>
+      )}
+    </div>
+
+    {/* ── SHEETS ── */}
+    {bulkLoading && (
+      <div style={{
+        position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)",
+        background: C.text, color: "#fff", borderRadius: 14,
+        padding: "12px 20px", fontSize: 13, fontWeight: 700,
+        display: "flex", alignItems: "center", gap: 10, zIndex: 300,
+        boxShadow: "0 8px 30px rgba(0,0,0,.2)", animation: "up .3s ease",
+      }}>
+        <span style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid #ffffff44", borderTopColor: "#fff", display: "inline-block", animation: "spin .7s linear infinite" }} />
+        Finding gifts for everyone...
+      </div>
+    )}
+
+    {bulkResults && (
+      <BulkResultsSheet data={bulkResults} storeIds={storeIds} customStores={customStores} onClose={() => setBulkResults(null)} />
+    )}
+    {sheet === "wishlist" && (
+      <WishListSheet wishList={wishList} onRemove={id => setWishP(w => w.filter(x => x.id !== id))}
+        onClear={() => setWishP([])} onClose={() => setSheet(null)}
+        myName={myName} myBirthday={[myBdMonth, myBdDay, myBdYear].filter(Boolean).join(" ")} />
+    )}
+    {sheet === "groups" && (
+      <GroupsSheet groups={groups}
+        onLoadPerson={p => { loadPerson(p); setSheet(null); }}
+        onCreate={g => setGroupsP(gs => [...gs, g])}
+        onClose={() => setSheet(null)}
+        onBulkSearch={(g, occ, customLabel, gb) => findGiftsForGroup(g, occ, customLabel, gb)}
+        bulkLoading={bulkLoading}
+        onDelete={deleteGroupById}
+        onRemovePerson={(gId, pId) => setGroupsP(gs => gs.map(g => g.id === gId ? {...g, people: g.people.filter(p => p.id !== pId)} : g))} />
+    )}
+    {sheet === "calendar" && (
+      <CalendarSheet people={people} groups={groups}
+        onLoadPerson={p => { loadPerson(p); setSheet(null); }}
+        onClose={() => setSheet(null)} />
+    )}
+    {sheet === "stores" && (
+      <StoresSheet storeIds={storeIds} onChange={setStoreP}
+        custom={customStores} onCustomChange={setCustomStoresP}
+        onClose={() => setSheet(null)} />
+    )}
+    {sheet === "saveGroup" && (
+      <SaveToGroupSheet person={currentPerson()} groups={groups}
+        onSave={saveToGroup} onClose={() => setSheet(null)} />
+    )}
+    {confirmPerson && (
+      <div style={{ position:"fixed", inset:0, background:"rgba(26,23,20,.45)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:700, padding:"0 24px" }}>
+        <div style={{ background:"#fff", borderRadius:24, padding:"28px 24px 24px", width:"100%", maxWidth:300, textAlign:"center", boxShadow:"0 20px 60px rgba(0,0,0,.22)" }}>
+          <div style={{ width:56, height:56, margin:"0 auto 14px", borderRadius:16, background:"#fff5f5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:26 }}>👤</div>
+          <div style={{ fontSize:17, fontWeight:900, color:"#1a1714", marginBottom:8 }}>Delete {confirmPerson.name || "this person"}?</div>
+          <div style={{ fontSize:13, color:"#6b6460", marginBottom:22, lineHeight:1.55 }}>Removed from My People and all groups.</div>
+          <div style={{ display:"flex", gap:10 }}>
+            <button onClick={() => setConfirmPerson(null)} style={{ flex:1, padding:13, borderRadius:14, border:"1.5px solid #ebe7e1", background:"#fff", color:"#6b6460", fontSize:14, fontWeight:800, cursor:"pointer", fontFamily:"inherit" }}>Cancel</button>
+            <button onClick={() => { setPeopleP(ps => ps.filter(x => x.id !== confirmPerson.id)); setGroupsP(gs => gs.map(g => ({...g, people: g.people.filter(x => x.id !== confirmPerson.id)}))); setConfirmPerson(null); }} style={{ flex:1, padding:13, borderRadius:14, border:"none", background:"#e07070", color:"#fff", fontSize:14, fontWeight:900, cursor:"pointer", fontFamily:"inherit" }}>Delete</button>
+          </div>
+        </div>
+      </div>
+    )}
+    {sheet === "createGroup" && (
+      <GroupsSheet groups={groups}
+        onLoadPerson={p => { loadPerson(p); setSheet(null); }}
+        onCreate={g => setGroupsP(gs => [...gs, g])}
+        onClose={() => setSheet(null)}
+        onBulkSearch={(g, occ, customLabel, gb) => findGiftsForGroup(g, occ, customLabel, gb)}
+        bulkLoading={bulkLoading}
+        onDelete={deleteGroupById}
+        onRemovePerson={(gId, pId) => setGroupsP(gs => gs.map(g => g.id === gId ? {...g, people: g.people.filter(p => p.id !== pId)} : g))} />
+    )}
+  </div>
+</>
+);
+}
