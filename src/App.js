@@ -489,14 +489,12 @@ fontFamily: "inherit", flexShrink: 0,
 }
 
 // ─── GROUPS SHEET ─────────────────────────────────────────────────────────────
-function GroupsSheet({ groups, onLoadPerson, onCreate, onClose, onBulkSearch, bulkLoading, onDelete, onRemovePerson }) {
+function GroupsSheet({ groups, onLoadPerson, onCreate, onClose, onBulkSearch, bulkLoading, onDelete }) {
   const [openId, setOpenId] = useState(null);
-  const [confirm, setConfirm] = useState(null);
   const [groupBudget, setGroupBudget] = useState("");
   const [budgetMode, setBudgetMode] = useState("Equal split");
   const [selectedOccasion, setSelectedOccasion] = useState("");
   const [customOcc, setCustomOcc] = useState("");
-
   const handleFind = (g) => {
     if (customOcc.trim()) {
       onBulkSearch(g, null, customOcc.trim(), groupBudget, budgetMode);
@@ -504,7 +502,6 @@ function GroupsSheet({ groups, onLoadPerson, onCreate, onClose, onBulkSearch, bu
       onBulkSearch(g, selectedOccasion, null, groupBudget, budgetMode);
     }
   };
-
   return (
     <Sheet onClose={onClose} title="👥 Groups">
       {groups.length === 0 && (
@@ -515,48 +512,28 @@ function GroupsSheet({ groups, onLoadPerson, onCreate, onClose, onBulkSearch, bu
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {groups.map(g => (
           <div key={g.id} style={{ background: C.card, border: `1.5px solid ${C.border}`, borderRadius: 16, overflow: "hidden" }}>
-            <div style={{ padding: "14px 16px", display: "flex", alignItems: "center", gap: 12 }}>
-              <div onClick={() => setOpenId(openId === g.id ? null : g.id)} style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, cursor: "pointer" }}>
-                <span style={{ fontSize: 24 }}>{g.emoji}</span>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 800, fontSize: 15, color: C.text }}>{g.name}</div>
-                  <div style={{ fontSize: 12, color: C.muted }}>{g.people.length} people</div>
-                </div>
-                <span style={{ color: C.muted, fontSize: 12 }}>{openId === g.id ? "▲" : "▼"}</span>
+            <div onClick={() => setOpenId(openId === g.id ? null : g.id)} style={{ padding: "14px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 12 }}>
+              <span style={{ fontSize: 24 }}>{g.emoji}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 800, fontSize: 15, color: C.text }}>{g.name}</div>
+                <div style={{ fontSize: 12, color: C.muted }}>{g.people.length} people</div>
               </div>
-              <button onClick={(e) => { e.stopPropagation(); setConfirm({ title: "Delete group?", body: "People will stay in My People.", onYes: () => { onDelete(g.id); setConfirm(null); } }); }} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 6px", borderRadius: 8 }}>
-                <svg width="16" height="16" viewBox="0 0 22 22" fill="none">
-                  <path d="M6 6h10" stroke="#e07070" strokeWidth="1.8" strokeLinecap="round"/>
-                  <path d="M9 6V4.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V6" stroke="#e07070" strokeWidth="1.5" strokeLinecap="round"/>
-                  <rect x="6.5" y="7" width="9" height="11" rx="1.5" stroke="#e07070" strokeWidth="1.5"/>
-                  <path d="M9 10v5M11 10v5M13 10v5" stroke="#e07070" strokeWidth="1.3" strokeLinecap="round"/>
-                </svg>
-              </button>
+              <span style={{ color: C.muted, fontSize: 12 }}>{openId === g.id ? "▲" : "▼"}</span>
             </div>
             {openId === g.id && (
               <>
-                {g.people.map((p) => {
+                {g.people.map((p, i) => {
                   const rel = RELATIONS.find(r => r.id === p.relation);
                   const bd = daysUntil(p.birthday);
                   return (
-                    <div key={p.id} style={{ padding: "11px 16px 11px 20px", borderTop: `1px solid ${C.border}`, display: "flex", alignItems: "center", gap: 12 }}>
-                      <div onClick={() => { onLoadPerson(p); onClose(); }} style={{ display: "flex", alignItems: "center", gap: 12, flex: 1, cursor: "pointer" }}>
-                        {p.photo ? <img src={p.photo} style={{ width: 36, height: 36, borderRadius: 10, objectFit: "cover" }} alt="" /> : <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f5f0eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{rel?.emoji}</div>}
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{p.name || rel?.label}</div>
-                          <div style={{ fontSize: 12, color: C.muted }}>{[p.age, p.interests].filter(Boolean).join(" · ")}</div>
-                          {bd !== null && bd >= 0 && bd <= 30 && (<div style={{ fontSize: 11, color: C.accent, fontWeight: 800 }}>🎂 Birthday in {bd}d</div>)}
-                        </div>
-                        <span style={{ color: C.muted, fontSize: 14 }}>→</span>
+                    <div key={p.id} onClick={() => { onLoadPerson(p); onClose(); }} style={{ padding: "11px 16px 11px 20px", borderTop: `1px solid ${C.border}`, cursor: "pointer", display: "flex", alignItems: "center", gap: 12 }}>
+                      {p.photo ? <img src={p.photo} style={{ width: 36, height: 36, borderRadius: 10, objectFit: "cover" }} alt="" /> : <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f5f0eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>{rel?.emoji}</div>}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, fontSize: 14, color: C.text }}>{p.name || rel?.label}</div>
+                        <div style={{ fontSize: 12, color: C.muted }}>{[p.age, p.interests].filter(Boolean).join(" · ")}</div>
+                        {bd !== null && bd >= 0 && bd <= 30 && (<div style={{ fontSize: 11, color: C.accent, fontWeight: 800 }}>🎂 Birthday in {bd}d</div>)}
                       </div>
-                      <button onClick={(e) => { e.stopPropagation(); setConfirm({ title: "Remove from group?", body: "Person stays in My People.", onYes: () => { onRemovePerson(g.id, p.id); setConfirm(null); } }); }} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px 6px", borderRadius: 8 }}>
-                        <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
-                          <path d="M6 6h10" stroke="#e07070" strokeWidth="1.8" strokeLinecap="round"/>
-                          <path d="M9 6V4.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V6" stroke="#e07070" strokeWidth="1.5" strokeLinecap="round"/>
-                          <rect x="6.5" y="7" width="9" height="11" rx="1.5" stroke="#e07070" strokeWidth="1.5"/>
-                          <path d="M9 10v5M11 10v5M13 10v5" stroke="#e07070" strokeWidth="1.3" strokeLinecap="round"/>
-                        </svg>
-                      </button>
+                      <span style={{ color: C.muted, fontSize: 14 }}>→</span>
                     </div>
                   );
                 })}
@@ -600,19 +577,6 @@ function GroupsSheet({ groups, onLoadPerson, onCreate, onClose, onBulkSearch, bu
           </div>
         ))}
       </div>
-      {confirm && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(26,23,20,.45)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:600, padding:"0 24px" }}>
-          <div style={{ background:"#fff", borderRadius:24, padding:"28px 24px 24px", width:"100%", maxWidth:300, textAlign:"center", boxShadow:"0 20px 60px rgba(0,0,0,.22)" }}>
-            <div style={{ width:56, height:56, margin:"0 auto 14px", borderRadius:16, background:"#fff5f5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:26 }}>🗑️</div>
-            <div style={{ fontSize:17, fontWeight:900, color:"#1a1714", marginBottom:8 }}>{confirm.title}</div>
-            <div style={{ fontSize:13, color:"#6b6460", marginBottom:22, lineHeight:1.55 }}>{confirm.body}</div>
-            <div style={{ display:"flex", gap:10 }}>
-              <button onClick={() => setConfirm(null)} style={{ flex:1, padding:13, borderRadius:14, border:"1.5px solid #ebe7e1", background:"#fff", color:"#6b6460", fontSize:14, fontWeight:800, cursor:"pointer", fontFamily:"inherit" }}>Cancel</button>
-              <button onClick={confirm.onYes} style={{ flex:1, padding:13, borderRadius:14, border:"none", background:"#e07070", color:"#fff", fontSize:14, fontWeight:900, cursor:"pointer", fontFamily:"inherit" }}>Delete</button>
-            </div>
-          </div>
-        </div>
-      )}
     </Sheet>
   );
 }
@@ -973,7 +937,6 @@ const [wishList, setWishList] = useState(() => load("pw_wishlist", []));
 const [resultsCount, setResultsCount] = useState(4);
 const [sortMode, setSortMode] = useState("trending");
   const [showMyPeople, setShowMyPeople] = useState(false);
-  const [confirmPerson, setConfirmPerson] = useState(null);
   const [confirmDeletePerson, setConfirmDeletePerson] = useState(null);
 const [myName, setMyName] = useState(() => load("pw_myname", ""));
 const [myBdMonth, setMyBdMonth] = useState(() => load("pw_mybdm", ""));
@@ -998,41 +961,6 @@ const setMyNameP = v => { setMyName(v); save("pw_myname", v); };
 const setMyBdMP = v => { setMyBdMonth(v); save("pw_mybdm", v); };
 const setMyBdDP = v => { setMyBdDay(v); save("pw_mybdd", v); };
 const setMyBdYP = v => { setMyBdYear(v); save("pw_mybdy", v); };
-const trashBtnStyle = {
-  background: "none",
-  border: "none",
-  cursor: "pointer",
-  padding: "6px 8px",
-  borderRadius: 8,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexShrink: 0,
-};
-
-const deleteGroupById = (groupId) => {
-  // confirmed via modal
-  setGroupsP(gs => gs.filter(g => g.id !== groupId));
-};
-
-const deletePersonFromGroup = (groupId, personId) => {
-  if (!window.confirm("Remove this person from this group?")) return;
-  setGroupsP(gs => gs.map(g =>
-    g.id === groupId
-      ? { ...g, people: g.people.filter(p => p.id !== personId) }
-      : g
-  ));
-};
-
-const deletePersonEverywhere = (personId) => {
-  // confirmed via modal
-  setPeopleP(ps => ps.filter(p => p.id !== personId));
-  setGroupsP(gs => gs.map(g => ({
-    ...g,
-    people: g.people.filter(p => p.id !== personId)
-  })));
-};
-
 
 const rel = RELATIONS.find(r => r.id === relation);
 const occ = OCCASIONS.find(o => o.id === occasion);
@@ -1108,7 +1036,7 @@ const findGifts = async () => {
 if (!relation && !forMe) { setError("Select who this gift is for."); return; }
 setError(null); setLoading(true); setResults([]); setSaved(false);
 try {
-const res = await fetch("/api/claude", {
+const res = await fetch("https://api.anthropic.com/v1/messages", {
 method: "POST",
 headers: {
 "Content-Type": "application/json",
@@ -1166,7 +1094,7 @@ return `${i}. ${rel?.label || "Person"}${p.name ? " (" + p.name + ")" : ""}, age
 }).join("\n");
 const prompt = `You are a US gift trend expert for 2026. Preferred stores: ${storeNames}. Return ONLY valid JSON. Find 2 trending gift ideas for each person: ${list} Each idea: { "personIndex": 0, "title": "Gift name", "searchQuery": "3-5 word search phrase", "trendReason": "Why trending in 2026 (max 8 words)", "description": "Why they will love it (2 sentences)", "category": "Fashion, Tech, Home, Beauty, Food, Sports, Gaming, Books, Experience, or Other", "priceHint": "Budget, Mid-range, Premium, or Luxury" } Format: { "gifts": [ ... ] }`;
 try {
-const res = await fetch("/api/claude", {
+const res = await fetch("https://api.anthropic.com/v1/messages", {
 method: "POST",
 headers: {
 "Content-Type": "application/json",
@@ -1251,31 +1179,27 @@ return (
                   {people.length === 0 && <div style={{ color: C.sub, fontSize: 13 }}>No saved people yet</div>}
                   {people.map(p => (
                     <div key={p.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${C.border}` }}>
-                      <div onClick={() => { loadPerson(p); setShowMyPeople(false); }} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         {p.photo ? <img src={p.photo} style={{ width: 36, height: 36, borderRadius: 10, objectFit: "cover" }} alt="" /> : <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f5f0eb", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>👤</div>}
                         <div>
                           <div style={{ fontWeight: 700, fontSize: 14 }}>{p.name || "Unnamed"}</div>
                           <div style={{ fontSize: 12, color: C.sub }}>{p.age}{p.relation ? ` · ${p.relation}` : ""}</div>
                         </div>
                       </div>
-                      <button
-                        onClick={() => setConfirmPerson({ name: p.name, id: p.id })}
-                        style={trashBtnStyle}
-                        title="Delete person"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 22 22" fill="none">
-                <path d="M6 6h10" stroke="#e07070" strokeWidth="1.8" strokeLinecap="round"/>
-                <path d="M9 6V4.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V6" stroke="#e07070" strokeWidth="1.5" strokeLinecap="round"/>
-                <rect x="6.5" y="7" width="9" height="11" rx="1.5" stroke="#e07070" strokeWidth="1.5"/>
-                <path d="M9 10v5M11 10v5M13 10v5" stroke="#e07070" strokeWidth="1.3" strokeLinecap="round"/>
-              </svg>
-                      </button>
+                      <button onClick={() => {
+                        if (window.confirm(`Delete ${p.name || "this person"}?`)) {
+                          const newPeople = people.filter(x => x.id !== p.id);
+                          setPeople(newPeople);
+                          const newGroups = groups.map(g => ({ ...g, people: g.people.filter(x => x.id !== p.id) }));
+                          setGroups(newGroups);
+                        }
+                      }} style={{ background: "none", border: "none", fontSize: 18, cursor: "pointer", color: "#e74c3c" }}>🗑️</button>
                     </div>
                   ))}
                 </div>
               </div>
             )}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}><div style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.5, color: C.muted, textTransform: "uppercase" }}>Who is the gift for?</div><button onClick={() => setShowMyPeople(true)} style={{ fontSize: 11, color: C.accent, background: C.accentL, border: "1.5px solid #c2714f44", borderRadius: 20, cursor: "pointer", fontWeight: 800, padding: "5px 12px", fontFamily: "inherit" }} style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.5, color: C.accent, textTransform: "uppercase", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0 }}>My People</button></div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><FL>Who is the gift for?</FL><button onClick={() => setShowMyPeople(true)} style={{ fontSize: 12, color: C.accent, background: "none", border: "none", cursor: "pointer", fontWeight: 700 }}>👥 My People</button></div>
         <div style={{ display: "flex", gap: 7, overflowX: "auto", paddingBottom: 6, marginBottom: 4 }}>
           {RELATIONS.map(r => {
             const isForMeBtn = r.id === "myself";
@@ -1285,7 +1209,7 @@ return (
                 if (isForMeBtn) { setForMe(f => !f); setRelation(""); setSavedMatches([]); }
                 else {
                   const newRel = relation === r.id ? "" : r.id;
-                  setRelation(newRel); setForMe(false); setResults([]); setName(""); setPhoto(null);
+                  setRelation(newRel); setForMe(false); setResults([]); setInterests("");
                   if (newRel) { setSavedMatches(findSaved(newRel)); } else { setSavedMatches([]); }
                 }
               }} style={{
@@ -1463,7 +1387,7 @@ return (
               </>
             )}
 
-            {forMe && !myBdMonth && !myBdYear && (
+            {forMe && (
               <>
                 <Sep />
                 <div style={{ marginTop: 16, marginBottom: 16 }}>
@@ -1725,8 +1649,7 @@ return (
         onClose={() => setSheet(null)}
         onBulkSearch={(g, occ, customLabel, gb) => findGiftsForGroup(g, occ, customLabel, gb)}
         bulkLoading={bulkLoading}
-        onDelete={deleteGroupById}
-        onRemovePerson={(gId, pId) => setGroupsP(gs => gs.map(g => g.id === gId ? {...g, people: g.people.filter(p => p.id !== pId)} : g))} />
+        onDelete={id => setGroupsP(gs => gs.filter(g => g.id !== id))} />
     )}
     {sheet === "calendar" && (
       <CalendarSheet people={people} groups={groups}
@@ -1742,19 +1665,6 @@ return (
       <SaveToGroupSheet person={currentPerson()} groups={groups}
         onSave={saveToGroup} onClose={() => setSheet(null)} />
     )}
-    {confirmPerson && (
-      <div style={{ position:"fixed", inset:0, background:"rgba(26,23,20,.45)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:1100, padding:"0 24px" }}>
-        <div style={{ background:"#fff", borderRadius:24, padding:"28px 24px 24px", width:"100%", maxWidth:300, textAlign:"center", boxShadow:"0 20px 60px rgba(0,0,0,.22)" }}>
-          <div style={{ width:56, height:56, margin:"0 auto 14px", borderRadius:16, background:"#fff5f5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:26 }}>👤</div>
-          <div style={{ fontSize:17, fontWeight:900, color:"#1a1714", marginBottom:8 }}>Delete {confirmPerson.name || "this person"}?</div>
-          <div style={{ fontSize:13, color:"#6b6460", marginBottom:22, lineHeight:1.55 }}>Removed from My People and all groups.</div>
-          <div style={{ display:"flex", gap:10 }}>
-            <button onClick={() => setConfirmPerson(null)} style={{ flex:1, padding:13, borderRadius:14, border:"1.5px solid #ebe7e1", background:"#fff", color:"#6b6460", fontSize:14, fontWeight:800, cursor:"pointer", fontFamily:"inherit" }}>Cancel</button>
-            <button onClick={() => { setPeopleP(ps => ps.filter(x => x.id !== confirmPerson.id)); setGroupsP(gs => gs.map(g => ({...g, people: g.people.filter(x => x.id !== confirmPerson.id)}))); setConfirmPerson(null); }} style={{ flex:1, padding:13, borderRadius:14, border:"none", background:"#e07070", color:"#fff", fontSize:14, fontWeight:900, cursor:"pointer", fontFamily:"inherit" }}>Delete</button>
-          </div>
-        </div>
-      </div>
-    )}
     {sheet === "createGroup" && (
       <GroupsSheet groups={groups}
         onLoadPerson={p => { loadPerson(p); setSheet(null); }}
@@ -1762,8 +1672,7 @@ return (
         onClose={() => setSheet(null)}
         onBulkSearch={(g, occ, customLabel, gb) => findGiftsForGroup(g, occ, customLabel, gb)}
         bulkLoading={bulkLoading}
-        onDelete={deleteGroupById}
-        onRemovePerson={(gId, pId) => setGroupsP(gs => gs.map(g => g.id === gId ? {...g, people: g.people.filter(p => p.id !== pId)} : g))} />
+        onDelete={id => setGroupsP(gs => gs.filter(g => g.id !== id))} />
     )}
   </div>
 </>
