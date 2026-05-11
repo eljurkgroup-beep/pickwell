@@ -1463,7 +1463,7 @@ return (
               </>
             )}
 
-            {forMe && (
+            {forMe && !bdMonth && !bdYear && (
               <>
                 <Sep />
                 <div style={{ marginTop: 16, marginBottom: 16 }}>
